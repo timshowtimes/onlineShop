@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="1750001441781-order" author="timshowtimes">
+        <createTable tableName="order">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(60)"/>
+            <column name="total_price" type="integer"/>
+            <column name="create_dt" type="timestamp" defaultValueComputed="NOW()"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="1750001471896-item" author="timshowtimes">
+        <createTable tableName="item">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(60)"/>
+            <column name="price" type="integer"/>
+            <column name="preview" type="bytea"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="1750001498119-ordersToItems" author="timshowtimes">
+        <createTable tableName="order_items">
+            <column name="order_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="item_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity" type="integer">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <addForeignKeyConstraint baseTableName="order_items"
+                                 baseColumnNames="order_id"
+                                 constraintName="fk_order_items_order"
+                                 referencedTableName="order"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="order_items"
+                                 baseColumnNames="item_id"
+                                 constraintName="fk_order_items_item"
+                                 referencedTableName="item"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>
