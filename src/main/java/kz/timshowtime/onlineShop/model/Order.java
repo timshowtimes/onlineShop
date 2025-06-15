@@ -1,6 +1,7 @@
 package kz.timshowtime.onlineShop.model;
 
 import jakarta.persistence.*;
+import kz.timshowtime.onlineShop.model.manyToMany.OrderItem;
 import lombok.Data;
 
 import java.time.LocalDateTime;

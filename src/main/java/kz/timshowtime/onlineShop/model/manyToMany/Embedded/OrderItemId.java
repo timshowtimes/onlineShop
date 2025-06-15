@@ -1,4 +1,4 @@
-package kz.timshowtime.onlineShop.model;
+package kz.timshowtime.onlineShop.model.manyToMany.Embedded;
 
 import lombok.EqualsAndHashCode;
 
