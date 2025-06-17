@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/add-item.css}"/>
+</head>
+<body>
+<div class="container">
+    <form method="POST"
+          th:action="${item == null ? '/posts/upload' : '/posts/' + item.getId()}"
+          enctype="multipart/form-data"
+          class="post-form">
+
+        <label for="title">Название</label>
+        <textarea id="title" name="title" rows="2" th:text="${item == null ? '' : item.getName()}"></textarea>
+
+        <label for="image">Изображение</label>
+        <input id="image" type="file" name="image"/>
+        <!--    <img id="preview"-->
+        <!--         th:if="${item != null}"-->
+        <!--         th:src="@{'http://localhost:8080/posts/images/' + ${post.id}}"-->
+        <!--         alt="Превью изображения"-->
+        <!--         style="max-width: 100%; margin-top: 10px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);"/>-->
+
+        <label for="price">Цена</label>
+        <input id="price"
+               name="price"
+               type="number"
+               min="0"
+               step="1"
+               class="price-input"
+               th:value="${item == null ? '' : item.getPrice()}" />
+
+        <label for="text">Описание товара</label>
+        <textarea id="text" name="text" rows="15" th:text="${item == null ? '' : item.getDescription()}"></textarea>
+
+        <button class="submit-btn" th:text="${item == null ? 'Сохранить' : 'Редактировать'}"></button>
+    </form>
+</div>
+</body>
+</html>

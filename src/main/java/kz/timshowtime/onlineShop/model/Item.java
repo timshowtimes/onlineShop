@@ -19,8 +19,13 @@ public class Item {
 
     private Integer price;
 
+    private String description;
+
+    private Integer count;
+
     private byte[] preview;
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orders = new ArrayList<>();
+
 }
