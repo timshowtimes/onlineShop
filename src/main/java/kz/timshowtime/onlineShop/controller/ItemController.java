@@ -1,7 +1,7 @@
 package kz.timshowtime.onlineShop.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
-import kz.timshowtime.onlineShop.SortName;
+import kz.timshowtime.onlineShop.enums.SortName;
 import kz.timshowtime.onlineShop.model.Item;
 import kz.timshowtime.onlineShop.model.ItemPageable;
 import kz.timshowtime.onlineShop.service.ItemService;

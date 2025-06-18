@@ -1,4 +1,4 @@
-package kz.timshowtime.onlineShop;
+package kz.timshowtime.onlineShop.enums;
 
 import lombok.Getter;
 
