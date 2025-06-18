@@ -3,6 +3,7 @@
 
 <head>
     <title>Витрина товаров</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/items.css}">
 </head>
 
 <body>
@@ -47,19 +48,19 @@
                 </form>
             </td>
         </tr>
-        <tr th:each="itemsRow : ${items}">
+        <tr th:each="itemsRow : ${items}" class="item">
             <td th:each="item : ${itemsRow}">
                 <table>
                     <tr>
                         <td>
                             <a th:href="${'/items/'+item.getId()}">
-                                <img width="300" height="300" th:src="@{'http://localhost:8080/items/images/'+ ${item.getId()}}" alt="Item image">
+                                <img width="300" th:src="@{'http://localhost:8080/items/images/'+ ${item.getId()}}" alt="Item image">
                             </a>
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <b th:text="${item.getName()} + '  |  '"></b>
+                            <b th:text="${item.getName()}"></b>
                         </td>
                         <td>
                             <b th:text="${item.getPrice()}+' $.'"></b>

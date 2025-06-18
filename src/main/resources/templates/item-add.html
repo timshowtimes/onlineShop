@@ -10,12 +10,12 @@
 <body>
 <div class="container">
     <form method="POST"
-          th:action="${item == null ? '/posts/upload' : '/posts/' + item.getId()}"
+          th:action="${item == null ? '/items/upload' : '/items/' + item.getId()}"
           enctype="multipart/form-data"
           class="post-form">
 
         <label for="title">Название</label>
-        <textarea id="title" name="title" rows="2" th:text="${item == null ? '' : item.getName()}"></textarea>
+        <textarea id="title" name="name" rows="2" th:text="${item == null ? '' : item.getName()}"></textarea>
 
         <label for="image">Изображение</label>
         <input id="image" type="file" name="image"/>

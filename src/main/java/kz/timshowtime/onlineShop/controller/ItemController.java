@@ -71,7 +71,7 @@ public class ItemController {
         return "item-add";
     }
 
-    @PostMapping("/create")
+    @PostMapping("/upload")
     public String addItem(@RequestParam("image") MultipartFile image,
                           @RequestParam("name") String name,
                           @RequestParam("price") Integer price,

@@ -27,6 +27,7 @@ public class ItemService {
                 .orElseThrow(() -> new NoSuchElementException("Item not found with id " + id));
     }
 
+    @Transactional
     public void save(Item item) {
         itemRepository.save(item);
     }

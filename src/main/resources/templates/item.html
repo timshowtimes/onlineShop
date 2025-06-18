@@ -3,6 +3,7 @@
 
 <head>
     <title>Витрина товаров</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/item.css}">
 </head>
 
 <body>
@@ -12,16 +13,16 @@
     <a href="/cart/items" style="float:right;">
         <b>КОРЗИНА &cudarrr;</b>
     </a>
-    <a href="/main/items" style="float:right;">
+    <a href="/items" style="float:right;">
         <b>ГЛАВНАЯ &cudarrr;</b>
     </a>
     <div style="width:70%;margin-left:auto;margin-right:auto;">
         <p>
-            <img width="300" height="300" th:src="${'http://localhost:8080/'+item.getPreview()}">
+            <img class="item-image" height="300" th:src="${'http://localhost:8080/items/images/'+item.getId()}">
         </p>
         <p>
             <b th:text="${item.getName()} + ', '"></b>
-            <b th:text="${item.getPrice()}+' руб.'" style="text-align:right;"></b>
+            <b th:text="${item.getPrice()}+' тг.'" style="text-align:right;"></b>
         </p>
         <p>
             <span th:text="${item.getDescription()}"></span>

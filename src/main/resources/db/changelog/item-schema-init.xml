@@ -17,7 +17,7 @@
 
     <changeSet id="1750001471896-item-desc-column" author="timshowtime">
         <addColumn tableName="item">
-            <column name="description" type="varchar(256)"/>
+            <column name="description" type="text"/>
         </addColumn>
     </changeSet>
 
