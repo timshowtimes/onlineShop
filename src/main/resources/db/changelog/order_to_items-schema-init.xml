@@ -5,7 +5,7 @@
                    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet id="1750001498119-ordersToItems" author="timshowtimes">
-        <createTable tableName="order_items">
+        <createTable tableName="orders_items">
             <column name="order_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
@@ -17,15 +17,15 @@
             </column>
         </createTable>
 
-        <addForeignKeyConstraint baseTableName="order_items"
+        <addForeignKeyConstraint baseTableName="orders_items"
                                  baseColumnNames="order_id"
                                  constraintName="fk_order_items_order"
-                                 referencedTableName="order"
+                                 referencedTableName="orders"
                                  referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint baseTableName="order_items"
+        <addForeignKeyConstraint baseTableName="orders_items"
                                  baseColumnNames="item_id"
-                                 constraintName="fk_order_items_item"
+                                 constraintName="fk_orders_items_item"
                                  referencedTableName="item"
                                  referencedColumnNames="id"/>
     </changeSet>

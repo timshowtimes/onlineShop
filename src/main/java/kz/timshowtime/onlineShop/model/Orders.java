@@ -1,7 +1,7 @@
 package kz.timshowtime.onlineShop.model;
 
 import jakarta.persistence.*;
-import kz.timshowtime.onlineShop.model.manyToMany.OrderItem;
+import kz.timshowtime.onlineShop.model.manyToMany.OrdersItem;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -10,7 +10,7 @@ import java.util.List;
 
 @Entity
 @Data
-public class Order {
+public class Orders {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +22,6 @@ public class Order {
 
     private LocalDateTime createDt;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderItem> items = new ArrayList<>();
+    @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrdersItem> items = new ArrayList<>();
 }

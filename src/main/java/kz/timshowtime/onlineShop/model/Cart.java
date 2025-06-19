@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 public class Cart {
     @Id
-    private int id;
+    private int id = 1;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> items = new ArrayList<>();

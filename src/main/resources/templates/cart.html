@@ -9,34 +9,42 @@
 <a href="/orders" style="float:right;">
     <b>ЗАКАЗЫ &cudarrr;</b>
 </a>
-<a href="/main/items" style="float:right;">
+<a href="/items" style="float:right;">
     <b>ГЛАВНАЯ &cudarrr;</b>
 </a>
 <table style="width:70%;margin-left:auto;margin-right:auto;">
-    <tr th:each="item : ${items}">
-        <td>
+    <tr th:each="itemsRow : ${items}" class="item">
+        <td th:each="item : ${itemsRow}">
             <table>
                 <tr>
                     <td>
-                        <img width="300" height="300" th:src="${'http://localhost:8080/'+item.getImgPath()}">
+                        <a th:href="${'/items/'+item.getId()}">
+                            <img width="300" th:src="@{'http://localhost:8080/items/images/'+ ${item.getId()}}"
+                                 alt="Item image">
+                        </a>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <b th:text="${item.getTitle()}"></b>
+                        <b th:text="${item.getName()}"></b>
                     </td>
                     <td>
-                        <b th:text="${item.getPrice()}+' руб.'"></b>
+                        <b th:text="${item.getPrice()}+' $.'"></b>
                     </td>
                 </tr>
-                <tr><td th:text="${item.getDescription()}"></td></tr>
+                <tr>
+                    <td th:text="${item.getTextPreview()}"></td>
+                </tr>
                 <tr>
                     <td>
-                        <form th:action="${'/cart/items/'+item.getId()}" method="post">
+                        <form th:action="${'/items/'+item.getId()}" method="post">
                             <button name="action" value="minus">-</button>
-                            <span th:text="${item.getCount()}"></span>
+                            <span th:text="${quantities[item.getId()] != null ? quantities[item.getId()] : 0}"></span>
                             <button name="action" value="plus">+</button>
-                            <button name="action" value="delete" style="float:right;">&cross;</button>
+                            <button
+                                    th:if="${quantities[item.getId()] == null or quantities[item.getId()] == 0}"
+                                    style="float:right;">В корзину
+                            </button>
                         </form>
                     </td>
                 </tr>
@@ -48,13 +56,13 @@
             <b th:text="'Итого: '+${total}+' руб.'"></b>
         </td>
     </tr>
-    <tr>
-        <td style="text-align:right">
-            <form action="/buy" method="post" th:if="${!empty}">
-                <button>Купить</button>
-            </form>
-        </td>
-    </tr>
+<!--    <tr>-->
+<!--        <td style="text-align:right">-->
+<!--            <form action="/buy" method="post" th:if="${!empty}">-->
+<!--                <button>Купить</button>-->
+<!--            </form>-->
+<!--        </td>-->
+<!--    </tr>-->
 </table>
 </body>
 

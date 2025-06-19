@@ -1,9 +1,9 @@
 package kz.timshowtime.onlineShop.repository;
 
-import kz.timshowtime.onlineShop.model.Order;
+import kz.timshowtime.onlineShop.model.Orders;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface OrderRepository extends JpaRepository<Order, Long> {
+public interface OrderRepository extends JpaRepository<Orders, Long> {
 }

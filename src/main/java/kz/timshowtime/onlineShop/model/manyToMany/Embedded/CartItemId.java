@@ -7,5 +7,5 @@ import java.io.Serializable;
 @EqualsAndHashCode
 public class CartItemId implements Serializable {
     private int cart;
-    private int item;
+    private long item;
 }

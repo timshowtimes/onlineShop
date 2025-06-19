@@ -18,11 +18,15 @@ import java.util.NoSuchElementException;
 public class ItemService {
     private final ItemRepository itemRepository;
 
+    public List<Item> findAll() {
+        return itemRepository.findAll();
+    }
+
     public List<Item> findAll(Specification<Item> spec, Pageable page) {
         return itemRepository.findAll(spec, page).getContent();
     }
 
-    public Item getById(Long id) {
+    public Item findById(Long id) {
         return itemRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Item not found with id " + id));
     }
@@ -37,6 +41,6 @@ public class ItemService {
     }
 
     public byte[] getImageByPostId(Long itemId) {
-        return getById(itemId).getPreview();
+        return findById(itemId).getPreview();
     }
 }

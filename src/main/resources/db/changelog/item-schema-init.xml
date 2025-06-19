@@ -21,10 +21,4 @@
         </addColumn>
     </changeSet>
 
-    <changeSet id="1750001471896-item-count-column" author="timshowtime">
-        <addColumn tableName="item">
-            <column name="count" type="integer"/>
-        </addColumn>
-    </changeSet>
-
 </databaseChangeLog>

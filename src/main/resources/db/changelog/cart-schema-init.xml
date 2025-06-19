@@ -13,4 +13,11 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="1750001498119-cart-init" author="timshowtime">
+        <insert tableName="cart">
+            <column name="id" value="1"/>
+            <column name="total_price" value="0"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>

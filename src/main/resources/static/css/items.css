@@ -13,6 +13,13 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
+
+.search-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
 .item img {
     max-width: 100%;
     height: auto;
