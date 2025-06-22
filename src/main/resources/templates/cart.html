@@ -29,7 +29,7 @@
                         <b th:text="${item.getName()}"></b>
                     </td>
                     <td>
-                        <b th:text="${item.getPrice()}+' $.'"></b>
+                        <b th:text="${item.getReadablePrice()}"></b>
                     </td>
                 </tr>
                 <tr>
@@ -38,13 +38,11 @@
                 <tr>
                     <td>
                         <form th:action="${'/items/'+item.getId()}" method="post">
+                            <input type="hidden" name="source" value="cart/items"/>
                             <button name="action" value="minus">-</button>
                             <span th:text="${quantities[item.getId()] != null ? quantities[item.getId()] : 0}"></span>
                             <button name="action" value="plus">+</button>
-                            <button
-                                    th:if="${quantities[item.getId()] == null or quantities[item.getId()] == 0}"
-                                    style="float:right;">В корзину
-                            </button>
+                            <button name="action" value="delete" style="float:right;">&cross;</button>
                         </form>
                     </td>
                 </tr>
@@ -53,16 +51,16 @@
     </tr>
     <tr>
         <td style="text-align:right">
-            <b th:text="'Итого: '+${total}+' руб.'"></b>
+            <b th:text="'Итого: '+${total}"></b>
         </td>
     </tr>
-<!--    <tr>-->
-<!--        <td style="text-align:right">-->
-<!--            <form action="/buy" method="post" th:if="${!empty}">-->
-<!--                <button>Купить</button>-->
-<!--            </form>-->
-<!--        </td>-->
-<!--    </tr>-->
+    <tr>
+        <td style="text-align:right">
+            <form action="/cart/buy" method="post">
+                <button th:disabled="${total.equals('0 тг.')}">Купить</button>
+            </form>
+        </td>
+    </tr>
 </table>
 </body>
 

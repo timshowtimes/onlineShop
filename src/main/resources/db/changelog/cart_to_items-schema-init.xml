@@ -30,4 +30,10 @@
                                  referencedTableName="item"
                                  referencedColumnNames="id"/>
     </changeSet>
+
+    <changeSet id="1750001498119-cartItems timestamp" author="timshowtimes">
+        <addColumn tableName="cart_items">
+            <column name="create_dt" type="timestamp" defaultValueComputed="NOW()"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

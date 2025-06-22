@@ -1,7 +1,6 @@
 package kz.timshowtime.onlineShop.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
-import kz.timshowtime.onlineShop.dto.ItemQuantityDto;
 import kz.timshowtime.onlineShop.enums.SortName;
 import kz.timshowtime.onlineShop.model.Cart;
 import kz.timshowtime.onlineShop.model.Item;
@@ -21,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -36,7 +37,7 @@ public class ItemController {
     @GetMapping
     public String all(@RequestParam(value = "search", required = false) String name,
                       @RequestParam(value = "sort", required = false, defaultValue = "NO") SortName sortValue,
-                      @RequestParam(value = "pageSize", required = false, defaultValue = "5") Integer pageSize,
+                      @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize,
                       @RequestParam(value = "pageNumber", required = false, defaultValue = "0") Integer pageNumber,
                       Model model) {
 
@@ -44,15 +45,16 @@ public class ItemController {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
         ItemPageable paging = ItemPageable.getPageable(pageNumber, pageSize, itemService.count());
         List<Item> items = itemService.findAll(ItemSpecification.nameOrDescContains(name), pageable);
-        List<ItemQuantityDto> quantities = cartItemService.getItemQuantities(1);
+        List<Item> quantities = cartItemService.getAllItems();
         Map<Long, Integer> quantityMap = quantities.stream()
-                .collect(Collectors.toMap(ItemQuantityDto::itemId, ItemQuantityDto::quantity));
+                .collect(Collectors.toMap(Item::getId, Item::getQuantity));
 
         model.addAttribute("items", items);
         model.addAttribute("sort", sortValue.name());
         model.addAttribute("search", name);
         model.addAttribute("paging", paging);
         model.addAttribute("quantities", quantityMap);
+        model.addAttribute("totalQuantity", cartItemService.getTotalQuantity());
 
         return "main";
     }
@@ -83,39 +85,50 @@ public class ItemController {
 
     @PostMapping("/{id}")
     public String putOnCart(@PathVariable("id") Long itemId,
-                            @RequestParam(value = "action", defaultValue = "plus") String action) {
+                            @RequestParam(value = "action", defaultValue = "plus") String action,
+                            @RequestParam(value = "source") String source) {
         Cart cart = cartService.findById(1);
         Item item = itemService.findById(itemId);
         int entityQuantity = cartItemService.findQuantityById(itemId);
 
         if (entityQuantity == 0 && action.equals("minus")) {
-            return "redirect:/items/" + itemId;
+            return String.format("redirect:/%s", source);
         }
 
-        if (action.equals("plus")) {
-            entityQuantity += 1;
-            System.out.println("Cart total price: " + cart.getTotalPrice());
-            System.out.println("Item price: " + item.getPrice());
-            cart.setTotalPrice(cart.getTotalPrice() + item.getPrice());
-        } else {
-            entityQuantity -= 1;
-            if (entityQuantity == 0) {
-                System.out.println("DELETING ITEM FROM CART");
-                cartItemService.deleteByItem(item);
-                return "redirect:/items/" + itemId;
+        switch (action) {
+            case "plus" -> {
+                entityQuantity += 1;
+                cart.setTotalPrice(cart.getTotalPrice() + item.getPrice());
             }
-            cart.setTotalPrice(cart.getTotalPrice() - item.getPrice());
-        } // TODO Общая цена корзины при уменьшении товара (если удалялся последний) не меняется
+            case "minus" -> {
+                entityQuantity -= 1;
+                cart.setTotalPrice(cart.getTotalPrice() - item.getPrice());
+                if (entityQuantity == 0) {
+                    cartItemService.deleteByItem(item);
+                    return redirect(source);
+                }
+            }
+            case "delete" -> {
+                cart.setTotalPrice(cart.getTotalPrice() - (item.getPrice() * entityQuantity));
+                cartItemService.deleteByItem(item);
+                return redirect(source);
+            }
+        }
 
         CartItem cartItem = CartItem.builder()
                 .cart(cart)
                 .item(item)
                 .quantity(entityQuantity)
+                .createDt(LocalDateTime.now())
                 .build();
 
         cartItemService.save(cartItem);
         cartService.save(cart);
-        return "redirect:/items/" + itemId;
+        return redirect(source);
+    }
+
+    private String redirect(String source) {
+        return "redirect:/" + source;
     }
 
     @GetMapping("/add-page")

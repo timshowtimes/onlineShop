@@ -22,12 +22,13 @@
     </p>
     <p>
         <b th:text="${item.getName()} + ', '"></b>
-        <b th:text="${item.getPrice()}+' тг.'" style="text-align:right;"></b>
+        <b th:text="${item.getReadablePrice()}" style="text-align:right;"></b>
     </p>
     <p>
         <span th:text="${item.getDescription()}"></span>
     </p>
     <form th:action="${'/items/'+item.getId()}" method="post">
+        <input type="hidden" name="source" th:value="${'items/' + item.getId()}"/>
         <button name="action" value="minus">-</button>
         <span th:text="${quantity != 0 ? quantity : 0}"></span>
         <button name="action" value="plus">+</button>

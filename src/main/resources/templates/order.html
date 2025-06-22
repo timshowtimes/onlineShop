@@ -12,35 +12,36 @@
 <a href="/cart/items" style="float:right;">
     <b>КОРЗИНА &cudarrr;</b>
 </a>
-<a href="/main/items" style="float:right;">
+<a href="/items" style="float:right;">
     <b>ГЛАВНАЯ &cudarrr;</b>
 </a>
 <h1 style="text-align:center" th:if="${newOrder}">Поздравляем! Успешная покупка! &#128578;</h1>
 <table style="width:70%;margin-left:auto;margin-right:auto;">
     <tr>
         <td>
-            <h2 th:text="${'Заказ №'+order.id()}"></h2>
+            <h2 th:text="${order.getName()}"></h2>
         </td>
     </tr>
-    <tr th:each="item : ${order.items()}">
+    <tr th:each="item : ${items}">
         <td>
             <table>
                 <tr>
                     <td>
-                        <a th:href="${'/items/'+item.getId()}">
-                            <img width="300" height="300" th:src="${'http://localhost:8080/'+item.getImgPath()}">
+                        <a th:href="${'/items/'+ item.getId()}">
+                            <img width="300" th:src="@{'http://localhost:8080/items/images/'+ ${item.getId()}}"
+                                 alt="Item image">
                         </a>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <b th:text="${item.getTitle()}"></b>
+                        <b th:text="${item.getTextPreview()}"></b>
                     </td>
                     <td>
-                        <b th:text="${item.getCount()}+' шт.'"></b>
+                        <b th:text="${item.getQuantity()}+' шт.'"></b>
                     </td>
                     <td>
-                        <b th:text="${item.getPrice()*item.getCount()}+' руб.'"></b>
+                        <b th:text="${item.getReadablePriceByQuantity()}"></b>
                     </td>
                 </tr>
             </table>
@@ -48,7 +49,7 @@
     </tr>
     <tr>
         <td>
-            <h3 th:text="${'Сумма: '+order.totalSum()}+' руб.'"></h3>
+            <h3 th:text="${'Сумма: '+order.getTotalPrice()}"></h3>
         </td>
     </tr>
 </table>

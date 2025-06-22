@@ -19,6 +19,11 @@ public class CartService {
         cartRepository.save(cart);
     }
 
+    @Transactional
+    public void deleteAllById(int id) {
+        cartRepository.deleteById(id);
+    }
+
     public Cart findById(int id) {
         return cartRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Cart not found with id " + id));

@@ -9,6 +9,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "cart_items")
 @IdClass(CartItemId.class)
@@ -29,4 +32,6 @@ public class CartItem {
     private Item item;
 
     private int quantity;
+
+    private LocalDateTime createDt;
 }

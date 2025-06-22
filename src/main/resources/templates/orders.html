@@ -9,22 +9,23 @@
 <a href="/cart/items" style="float:right;">
     <b>КОРЗИНА &cudarrr;</b>
 </a>
-<a href="/main/items" style="float:right;">
+<a href="/items" style="float:right;">
     <b>ГЛАВНАЯ &cudarrr;</b>
 </a>
 <table style="width:70%;margin-left:auto;margin-right:auto;">
     <tr th:each="order : ${orders}">
         <td>
             <h2>
-                <a th:text="${'Заказ №'+order.id()}" th:href="${'/orders/'+order.id()}"></a>
+                <a th:text="${order.getName()}" th:href="${'/orders/'+order.getId()}"></a>
             </h2>
             <table>
-                <tr th:each="item : ${order.items()}">
-                    <td th:text="${item.getTitle()+' ('+item.getCount()+' шт.) '+(item.getPrice()*item.getCount())+' руб.'}"></td>
+                <tr th:each="item : ${order.getItems()}">
+                    <td th:text="${item.getItem().getName() +' ('+item.getQuantity()+' шт.) '
+                     + (item.getReadablePriceByQuantity())}"></td>
                 </tr>
             </table>
             <p>
-                <b th:text="${'Сумма: '+order.totalSum()}+' руб.'"></b>
+                <b th:text="${'Сумма: '+order.getTotalPrice()}"></b>
             </p>
         </td>
     </tr>

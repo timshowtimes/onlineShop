@@ -1,6 +1,6 @@
 package kz.timshowtime.onlineShop.service;
 
-import kz.timshowtime.onlineShop.dto.ItemQuantityDto;
+import kz.timshowtime.onlineShop.model.Cart;
 import kz.timshowtime.onlineShop.model.Item;
 import kz.timshowtime.onlineShop.model.manyToMany.CartItem;
 import kz.timshowtime.onlineShop.repository.CartItemRepository;
@@ -18,6 +18,15 @@ public class CartItemService {
 
     private final CartItemRepository cartItemRepository;
 
+    public Integer getTotalQuantity() {
+        return cartItemRepository.getTotalQuantity();
+    }
+
+    @Transactional
+    public void deleteAllByCart(Cart cart) {
+        cartItemRepository.deleteAllByCart(cart);
+    }
+
     public List<Item> getAllItems() {
         return cartItemRepository.getAllItems();
     }
@@ -27,8 +36,9 @@ public class CartItemService {
         cartItemRepository.deleteByItem(item);
     }
 
-    public List<ItemQuantityDto> getItemQuantities(int cartId) {
-        return cartItemRepository.findItemQuantitiesByCartId(cartId);
+
+    public List<CartItem> getCartItems(Cart cart) {
+        return cartItemRepository.findByCart(cart);
     }
 
     public int findQuantityById(long itemId) {

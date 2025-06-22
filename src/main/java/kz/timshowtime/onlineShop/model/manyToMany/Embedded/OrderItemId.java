@@ -6,6 +6,6 @@ import java.io.Serializable;
 
 @EqualsAndHashCode
 public class OrderItemId implements Serializable {
-    private Long orders;
+    private Long order;
     private Long item;
 }
