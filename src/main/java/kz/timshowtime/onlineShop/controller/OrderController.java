@@ -1,9 +1,6 @@
 package kz.timshowtime.onlineShop.controller;
 
-import kz.timshowtime.onlineShop.dto.OrderItemDto;
 import kz.timshowtime.onlineShop.model.Item;
-import kz.timshowtime.onlineShop.model.manyToMany.OrdersItem;
-import kz.timshowtime.onlineShop.service.OrderItemService;
 import kz.timshowtime.onlineShop.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -21,20 +18,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderController {
     public final OrderService orderService;
-    public final OrderItemService orderItemService;
 
     @GetMapping
     public String all(Model model) {
         List<Order> orders = orderService.findAll();
-//        List<Item> items = orderService.getAllItems();
-//        for (OrdersItem ordersItem : order.getItems()) {
-//            Item item = ordersItem.getItem();
-//            int quantity = ordersItem.getQuantity();
-//            System.out.println("Item: " + item);
-//            System.out.println("Quantity: " + quantity);
-////            System.out.println("Order " + orderItemDto.orderId() + " Item: " + orderItemDto.item());
-//        }
-//        System.out.println("Order item: " + orders.get(0).item());
         model.addAttribute("orders", orders);
         return "orders";
     }

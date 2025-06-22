@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,7 +58,6 @@ public class CartController {
         Order order = createOrder("Заказ №" + System.currentTimeMillis() + (count + 1),
                 itemsWithQuantities, total);
         cartItemService.deleteAllByCart(cart);
-//        cartService.deleteAllById(cart.getId());
         cart.setTotalPrice(0);
         cartService.save(cart);
         return "redirect:/orders/" + order.getId() + "?new=true";

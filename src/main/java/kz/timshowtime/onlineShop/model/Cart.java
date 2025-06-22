@@ -7,7 +7,6 @@ import jakarta.persistence.OneToMany;
 import kz.timshowtime.onlineShop.model.manyToMany.CartItem;
 import lombok.Data;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 

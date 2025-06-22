@@ -1,7 +1,5 @@
 package kz.timshowtime.onlineShop.service;
 
-import kz.timshowtime.onlineShop.dto.OrderItemDto;
-import kz.timshowtime.onlineShop.model.Order;
 import kz.timshowtime.onlineShop.model.manyToMany.OrdersItem;
 import kz.timshowtime.onlineShop.repository.OrderItemRepository;
 import lombok.RequiredArgsConstructor;

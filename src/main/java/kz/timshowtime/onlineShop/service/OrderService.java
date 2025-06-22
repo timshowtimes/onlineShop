@@ -26,10 +26,6 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    public List<Item> getAllItems() {
-        return orderRepository.getAllItems();
-    }
-
     public List<Item> getAllItemsByOrder(long orderId) {
         return orderRepository.getAllItemsByOrder(orderId);
     }

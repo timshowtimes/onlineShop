@@ -32,8 +32,6 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrdersItem> items = new ArrayList<>();
 
-//    public Order(Long id, String name) {}
-
     public String getTotalPrice() {
         return String.format("%,d тг", totalPrice).replace(",", " ");
     }
