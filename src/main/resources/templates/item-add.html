@@ -8,6 +8,11 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/add-item.css}"/>
 </head>
 <body>
+<div class="add-page-header">
+    <a href="/items"><b>ГЛАВНАЯ &cudarrr;</b></a>
+    <a href="/cart/items"><b>КОРЗИНА &cudarrr;</b></a>
+    <a href="/orders"><b>ЗАКАЗЫ &cudarrr;</b></a>
+</div>
 <div class="container">
     <form method="POST"
           th:action="${item == null ? '/items/upload' : '/items/' + item.getId()}"
