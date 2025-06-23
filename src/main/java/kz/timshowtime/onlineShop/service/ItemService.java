@@ -18,10 +18,6 @@ import java.util.NoSuchElementException;
 public class ItemService {
     private final ItemRepository itemRepository;
 
-    public List<Item> findAll() {
-        return itemRepository.findAll();
-    }
-
     public List<Item> findAll(Specification<Item> spec, Pageable page) {
         return itemRepository.findAll(spec, page).getContent();
     }

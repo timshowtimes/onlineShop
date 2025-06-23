@@ -72,7 +72,7 @@
 <div class="item-grid">
     <div th:each="item : ${items}" class="item-card">
         <a th:href="${'/items/'+item.getId()}">
-            <img th:src="@{'http://localhost:8080/items/images/'+ ${item.getId()}}" alt="Item image">
+            <img th:src="@{'http://localhost:' + ${port} + '/items/images/' + ${item.getId()}}" alt="Item image">
         </a>
         <div class="item-name" th:text="${item.getValidName()}"></div>
         <div class="item-preview" th:text="${item.getTextPreview()}"></div>

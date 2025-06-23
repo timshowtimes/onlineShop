@@ -11,6 +11,7 @@ import kz.timshowtime.onlineShop.service.CartService;
 import kz.timshowtime.onlineShop.service.ItemService;
 import kz.timshowtime.onlineShop.specification.ItemSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -33,6 +34,9 @@ public class ItemController {
     private final CartService cartService;
     private final CartItemService cartItemService;
 
+    @Value("${server.port}")
+    private String port;
+
     @GetMapping
     public String all(@RequestParam(value = "search", required = false) String name,
                       @RequestParam(value = "sort", required = false, defaultValue = "NO") SortName sortValue,
@@ -54,6 +58,7 @@ public class ItemController {
         model.addAttribute("paging", paging);
         model.addAttribute("quantities", quantityMap);
         model.addAttribute("totalQuantity", cartItemService.getTotalQuantity());
+        model.addAttribute("port", port);
 
         return "main";
     }
