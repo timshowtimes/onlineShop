@@ -61,8 +61,8 @@ public class Item {
 
     }
 
-    public String getName() {
-        return getValidLength(name, 46);
+    public String getValidName() {
+        return getValidLength(name, 40);
     }
 
     private String getValidLength(String field, int length) {

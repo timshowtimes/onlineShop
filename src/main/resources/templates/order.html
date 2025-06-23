@@ -3,56 +3,39 @@
 
 <head>
     <title>Заказ</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/order.css}">
 </head>
 
 <body>
-<a href="/orders" style="float:right;">
-    <b>ЗАКАЗЫ &cudarrr;</b>
-</a>
-<a href="/cart/items" style="float:right;">
-    <b>КОРЗИНА &cudarrr;</b>
-</a>
-<a href="/items" style="float:right;">
-    <b>ГЛАВНАЯ &cudarrr;</b>
-</a>
-<h1 style="text-align:center" th:if="${newOrder}">Поздравляем! Успешная покупка! &#128578;</h1>
-<table style="width:70%;margin-left:auto;margin-right:auto;">
-    <tr>
-        <td>
-            <h2 th:text="${order.getName()}"></h2>
-        </td>
-    </tr>
-    <tr th:each="item : ${items}">
-        <td>
-            <table>
-                <tr>
-                    <td>
-                        <a th:href="${'/items/'+ item.getId()}">
-                            <img width="300" th:src="@{'http://localhost:8080/items/images/'+ ${item.getId()}}"
-                                 alt="Item image">
-                        </a>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <b th:text="${item.getTextPreview()}"></b>
-                    </td>
-                    <td>
-                        <b th:text="${item.getQuantity()}+' шт.'"></b>
-                    </td>
-                    <td>
-                        <b th:text="${item.getReadablePriceByQuantity()}"></b>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <h3 th:text="${'Сумма: '+order.getTotalPrice()}"></h3>
-        </td>
-    </tr>
-</table>
+<div class="order-header">
+    <a href="/orders"><b>ЗАКАЗЫ &cudarrr;</b></a>
+    <a href="/cart/items"><b>КОРЗИНА &cudarrr;</b></a>
+    <a href="/items"><b>ГЛАВНАЯ &cudarrr;</b></a>
+</div>
+
+<h1 class="order-success" th:if="${newOrder}">
+    Поздравляем! Успешная покупка! 😊
+</h1>
+
+<div class="order-wrapper">
+    <h2 th:text="${order.getName()}"></h2>
+
+    <div class="order-items" th:each="item : ${items}">
+        <div class="order-item-card">
+            <a th:href="${'/items/'+ item.getId()}">
+                <img class="order-item-image" th:src="@{'http://localhost:8080/items/images/'+ ${item.getId()}}" alt="Item image">
+            </a>
+            <div class="order-item-info">
+                <div class="order-item-text" th:text="${item.getTextPreview()}"></div>
+                <div class="order-item-quantity" th:text="${item.getQuantity()} + ' шт.'"></div>
+                <div class="order-item-price" th:text="${item.getReadablePriceByQuantity()}"></div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="order-total" th:text="${'Сумма: ' + order.getTotalPrice()}"></h3>
+</div>
+
 </body>
 
 </html>

@@ -12,3 +12,49 @@ body {
     margin-bottom: 20px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
+
+.item-actions {
+
+    margin-top: auto;
+}
+
+.item-actions form {
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+    margin-top: 20px;
+}
+
+.item-actions button {
+    padding: 6px 12px;
+    background-color: #2196f3;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-size: initial;
+}
+
+.item-actions button:hover {
+    background-color: #0056b3;
+}
+
+.item-price {
+    color: #519721;
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    height: 30px;
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+a {
+    text-decoration: none;
+    color: #007BFF;
+}
+
+a:hover {
+    text-decoration: underline;
+}

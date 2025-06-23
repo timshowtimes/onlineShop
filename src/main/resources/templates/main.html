@@ -9,34 +9,43 @@
 
 <body>
 
-    <a href="/orders" style="float:right;">
-        <b>ЗАКАЗЫ &cudarrr;</b>
-    </a>
+<a href="/orders" style="float:right;">
+    <b>ЗАКАЗЫ &cudarrr;</b>
+</a>
 
-    <a href="/cart/items" style="float:right; margin-right: 15px;">
-        <b th:text="${'КОРЗИНА' + '(' + totalQuantity + ')'}"></b>
-    </a>
+<a href="/cart/items" style="float:right; margin-right: 15px;">
+    <b th:text="${'КОРЗИНА' + '(' + totalQuantity + ')'}"></b>
+</a>
 
-    <form>
+<form>
+    <div class="controls-container">
         <div class="form-controls">
-            <p>
-                <label for="search">Найти: </label>
-                <input id="search" style="width:300px;" name="search" th:value="${search}">
-                <button name="action">&#128269;</button>
-            </p>
-            <p>
-                <label for="sort">Сортировка: </label>
-                <select id="sort" name="sort" onchange="this.form.submit()">
+            <div class="search-wrapper">
+                <label for="search">Найти:</label>
+                <div class="search-input-container">
+                    <span class="search-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24"
+                             stroke="#888"
+                             stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z"/>
+                        </svg>
+                    </span>
+                    <input id="search" name="search" th:value="${search}" placeholder="Поиск товара...">
+                </div>
+            </div>
+            <div class="sort-wrapper">
+                <label for="sort">Сортировка:</label>
+                <select class="sort-select" id="sort" name="sort" onchange="this.form.submit()">
                     <option value="NO" th:selected="${sort=='NO'}">нет</option>
                     <option value="ALPHA" th:selected="${sort=='ALPHA'}">по алфавиту</option>
                     <option value="PRICE" th:selected="${sort=='PRICE'}">по цене</option>
                 </select>
-            </p>
+            </div>
             <p>
-            <div>
-                <label for="pageSize">Число товаров: </label>
+            <div class="page-size-wrapper">
+                <label for="pageSize">Число товаров:</label>
                 <select id="pageSize" name="pageSize" onchange="this.form.submit()">
-<!--                    <option value="5" th:selected="${paging.pageSize()==5}">5</option>-->
                     <option value="10" th:selected="${paging.pageSize()==10}">10</option>
                     <option value="20" th:selected="${paging.pageSize()==20}">20</option>
                     <option value="50" th:selected="${paging.pageSize()==50}">50</option>
@@ -51,31 +60,32 @@
             <button th:if="${paging.hasNext()}" name="pageNumber" th:value="${paging.pageNumber()+1}">&gt;
             </button>
         </p>
-    </form>
-    <!--        </td>-->
-    <!--    </tr>-->
+    </div>
+</form>
+<!--        </td>-->
+<!--    </tr>-->
 
-    <div class="item-grid">
-        <div th:each="item : ${items}" class="item-card">
-            <a th:href="${'/items/'+item.getId()}">
-                <img th:src="@{'http://localhost:8080/items/images/'+ ${item.getId()}}" alt="Item image">
-            </a>
-            <div class="item-name" th:text="${item.getName()}"></div>
-            <div class="item-preview" th:text="${item.getTextPreview()}"></div>
-            <div class="item-price" th:text="${item.getReadablePrice()}"></div>
-            <div class="item-actions">
-                <form th:action="${'/items/'+item.getId()}" method="post">
-                    <input type="hidden" name="source" value="items"/>
-                    <button name="action" value="minus">-</button>
-                    <span th:text="${quantities[item.getId()] != null ? quantities[item.getId()] : 0}"></span>
-                    <button name="action" value="plus">+</button>
-                    <button th:if="${quantities[item.getId()] == null or quantities[item.getId()] == 0}">
-                        В корзину
-                    </button>
-                </form>
-            </div>
+<div class="item-grid">
+    <div th:each="item : ${items}" class="item-card">
+        <a th:href="${'/items/'+item.getId()}">
+            <img th:src="@{'http://localhost:8080/items/images/'+ ${item.getId()}}" alt="Item image">
+        </a>
+        <div class="item-name" th:text="${item.getValidName()}"></div>
+        <div class="item-preview" th:text="${item.getTextPreview()}"></div>
+        <div class="item-price" th:text="${item.getReadablePrice()}"></div>
+        <div class="item-actions">
+            <form th:action="${'/items/'+item.getId()}" method="post">
+                <input type="hidden" name="source" value="items"/>
+                <button name="action" value="minus">-</button>
+                <span th:text="${quantities[item.getId()] != null ? quantities[item.getId()] : 0}"></span>
+                <button name="action" value="plus">+</button>
+                <button th:if="${quantities[item.getId()] == null or quantities[item.getId()] == 0}">
+                    В корзину
+                </button>
+            </form>
         </div>
     </div>
+</div>
 
 </body>
 

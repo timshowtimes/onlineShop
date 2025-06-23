@@ -4,6 +4,7 @@ import kz.timshowtime.onlineShop.model.Item;
 import kz.timshowtime.onlineShop.model.Order;
 import kz.timshowtime.onlineShop.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +19,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
 
     public List<Order> findAll() {
-        return orderRepository.findAll();
+        return orderRepository.findAll(Sort.by(Sort.Direction.DESC, "createDt"));
     }
 
     @Transactional

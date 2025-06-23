@@ -3,65 +3,49 @@
 
 <head>
     <title>Корзина товаров</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/cart.css}">
 </head>
 
 <body>
-<a href="/orders" style="float:right;">
-    <b>ЗАКАЗЫ &cudarrr;</b>
-</a>
-<a href="/items" style="float:right;">
-    <b>ГЛАВНАЯ &cudarrr;</b>
-</a>
-<table style="width:70%;margin-left:auto;margin-right:auto;">
-    <tr th:each="itemsRow : ${items}" class="item">
-        <td th:each="item : ${itemsRow}">
-            <table>
-                <tr>
-                    <td>
-                        <a th:href="${'/items/'+item.getId()}">
-                            <img width="300" th:src="@{'http://localhost:8080/items/images/'+ ${item.getId()}}"
-                                 alt="Item image">
-                        </a>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <b th:text="${item.getName()}"></b>
-                    </td>
-                    <td>
-                        <b th:text="${item.getReadablePrice()}"></b>
-                    </td>
-                </tr>
-                <tr>
-                    <td th:text="${item.getTextPreview()}"></td>
-                </tr>
-                <tr>
-                    <td>
-                        <form th:action="${'/items/'+item.getId()}" method="post">
-                            <input type="hidden" name="source" value="cart/items"/>
-                            <button name="action" value="minus">-</button>
-                            <span th:text="${quantities[item.getId()] != null ? quantities[item.getId()] : 0}"></span>
-                            <button name="action" value="plus">+</button>
-                            <button name="action" value="delete" style="float:right;">&cross;</button>
-                        </form>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-    <tr>
-        <td style="text-align:right">
-            <b th:text="'Итого: '+${total}"></b>
-        </td>
-    </tr>
-    <tr>
-        <td style="text-align:right">
-            <form action="/cart/buy" method="post">
-                <button th:disabled="${total.equals('0 тг.')}">Купить</button>
+<div class="cart-header">
+    <a href="/orders"><b>ЗАКАЗЫ &cudarrr;</b></a>
+    <a href="/items"><b>ГЛАВНАЯ &cudarrr;</b></a>
+</div>
+
+<div class="cart-container" th:each="itemsRow : ${items}">
+    <div class="cart-item" th:each="item : ${itemsRow}">
+        <a th:href="${'/items/'+item.getId()}">
+            <img class="cart-item-image" th:src="@{'http://localhost:8080/items/images/'+ ${item.getId()}}" alt="Item image">
+        </a>
+        <div class="cart-item-info">
+            <div class="cart-item-title" th:text="${item.getName()}"></div>
+            <div class="cart-item-price" th:text="${item.getReadablePrice()}"></div>
+            <div class="cart-item-description" th:text="${item.getTextPreview()}"></div>
+            <form th:action="${'/items/'+item.getId()}" method="post" class="cart-item-actions">
+                <input type="hidden" name="source" value="cart/items"/>
+
+                <div class="quantity-actions">
+                    <button name="action" value="minus">−</button>
+                    <span th:text="${quantities[item.getId()] != null ? quantities[item.getId()] : 0}"></span>
+                    <button name="action" value="plus">+</button>
+                </div>
+
+                <button name="action" value="delete" class="delete-btn">&times;</button>
             </form>
-        </td>
-    </tr>
-</table>
+
+        </div>
+    </div>
+</div>
+
+<div class="cart-summary">
+    <div class="cart-total">
+        <b th:text="'Итого: ' + ${total}"></b>
+    </div>
+    <form action="/cart/buy" method="post">
+        <button class="buy-btn" th:disabled="${total.equals('0 тг.')}">Купить</button>
+    </form>
+</div>
+
 </body>
 
 </html>
