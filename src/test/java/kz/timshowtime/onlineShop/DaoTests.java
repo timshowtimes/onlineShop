@@ -74,7 +74,7 @@ public class DaoTests {
     }
 
     private Item createItemWithoutId() {
-        Item item = new Item(); // или через builder
+        Item item = new Item();
         item.setName("Smartphone TestPhone X1");
         item.setPrice(19999);
         item.setDescription("Test desc 1");

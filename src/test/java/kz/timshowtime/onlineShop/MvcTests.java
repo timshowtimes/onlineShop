@@ -26,8 +26,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-//@ImportTestcontainers(TestcontainersConfiguration.class)
-//@Testcontainers
 @WebMvcTest(controllers = {ItemController.class, CartController.class})
 class MvcTests {
 
@@ -45,9 +43,6 @@ class MvcTests {
 
     @MockitoBean(reset = MockReset.BEFORE)
     private OrderService orderService;
-
-    @MockitoBean(reset = MockReset.BEFORE)
-    private OrderItemService orderItemService;
 
     @Test
     public void getAllItem() throws Exception {
