@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -28,8 +29,8 @@ public class ItemService {
     }
 
     @Transactional
-    public void save(Item item) {
-        itemRepository.save(item);
+    public Mono<Item> save(Item item) {
+        return itemRepository.save(item);
     }
 
     public long count() {

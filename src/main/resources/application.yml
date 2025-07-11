@@ -1,0 +1,9 @@
+spring:
+  r2dbc:
+    url: ${SPRING_DATASOURCE_URL:r2dbc:postgresql://localhost:5434/onlineshop}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:12345}
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/master/db.changelog-master.xml

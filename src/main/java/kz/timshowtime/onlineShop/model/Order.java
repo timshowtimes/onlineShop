@@ -1,17 +1,18 @@
 package kz.timshowtime.onlineShop.model;
 
-import jakarta.persistence.*;
 import kz.timshowtime.onlineShop.model.manyToMany.OrdersItem;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
 @Data
 @Builder
 @NoArgsConstructor
@@ -20,7 +21,6 @@ import java.util.List;
 public class Order {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
@@ -29,7 +29,7 @@ public class Order {
 
     private LocalDateTime createDt;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Transient
     private List<OrdersItem> items = new ArrayList<>();
 
     public String getTotalPrice() {
