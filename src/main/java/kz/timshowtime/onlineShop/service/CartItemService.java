@@ -1,14 +1,17 @@
 package kz.timshowtime.onlineShop.service;
 
+import kz.timshowtime.onlineShop.dto.ItemDto;
 import kz.timshowtime.onlineShop.model.Cart;
 import kz.timshowtime.onlineShop.model.Item;
 import kz.timshowtime.onlineShop.model.manyToMany.CartItem;
 import kz.timshowtime.onlineShop.repository.CartItemRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -17,35 +20,37 @@ public class CartItemService {
 
     private final CartItemRepository cartItemRepository;
 
-    public Integer getTotalQuantity() {
+    private final R2dbcEntityTemplate template;
+
+    public Mono<Integer> getTotalQuantity() {
         return cartItemRepository.getTotalQuantity();
     }
 
     @Transactional
-    public void deleteAllByCart(Cart cart) {
-        cartItemRepository.deleteAllByCart(cart);
+    public Mono<Void> deleteAllByCart(Cart cart) {
+        return cartItemRepository.deleteAllByCartId(cart.getId());
     }
 
-    public List<Item> getAllItems() {
+    public Flux<ItemDto> getAllItems() {
         return cartItemRepository.getAllItems();
     }
 
     @Transactional
-    public void deleteByItem(Item item) {
-        cartItemRepository.deleteByItem(item);
+    public Mono<Void> deleteByItemId(Long itemId) {
+       return cartItemRepository.deleteByItemId(itemId);
     }
 
 
-    public List<CartItem> getCartItems(Cart cart) {
-        return cartItemRepository.findByCart(cart);
+    public Flux<CartItem> getCartItems(Long cartId) {
+        return cartItemRepository.findByCartId(cartId);
     }
 
-    public int findQuantityById(long itemId) {
-        return cartItemRepository.findQuantityById(itemId).orElse(0);
+    public Mono<Integer> findQuantityByItemId(long itemId) {
+        return cartItemRepository.findQuantityByItemId(itemId);
     }
 
     @Transactional
-    public void save(CartItem cartItem) {
-        cartItemRepository.save(cartItem);
+    public Mono<CartItem> saveOrUpdate(CartItem cartItem) {
+       return cartItemRepository.saveOrUpdate(cartItem);
     }
 }

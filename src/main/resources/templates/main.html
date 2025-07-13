@@ -2,6 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
+    <meta charset="UTF-8">
     <title>Витрина товаров</title>
 
     <link rel="stylesheet" type="text/css" th:href="@{/css/items.css}">
@@ -78,7 +79,7 @@
         <div class="item-preview" th:text="${item.getTextPreview()}"></div>
         <div class="item-price" th:text="${item.getReadablePrice()}"></div>
         <div class="item-actions">
-            <form th:action="${'/items/'+item.getId()}" method="post">
+            <form th:action="${'/cart/'+item.getId()}" method="post">
                 <input type="hidden" name="source" value="items"/>
                 <button name="action" value="minus">-</button>
                 <span th:text="${quantities[item.getId()] != null ? quantities[item.getId()] : 0}"></span>

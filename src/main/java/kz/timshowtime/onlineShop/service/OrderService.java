@@ -35,7 +35,7 @@ public class OrderService {
         String sql = """
         SELECT i.id, i.name, i.price, i.description, i.preview, oi.quantity
         FROM item i
-        JOIN orders_item oi ON i.id = oi.item_id
+        JOIN orders_items oi ON i.id = oi.item_id
         WHERE oi.order_id = ?
     """;
 
@@ -47,7 +47,7 @@ public class OrderService {
                         row.get("name", String.class),
                         row.get("price", Integer.class),
                         row.get("description", String.class),
-                        row.get("preview", String.class),
+                        row.get("preview", byte[].class),
                         row.get("quantity", Integer.class)
                 ))
                 .all();

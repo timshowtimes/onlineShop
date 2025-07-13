@@ -36,4 +36,19 @@
             <column name="create_dt" type="timestamp" defaultValueComputed="NOW()"/>
         </addColumn>
     </changeSet>
+
+    <changeSet id="1750001498119-cartItems id column" author="timshowtimes">
+        <addColumn tableName="cart_items">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    
+    <changeSet id="1750001498119-cartItems unique pair column" author="timshowtimes">
+        <addUniqueConstraint
+                tableName="cart_items"
+                columnNames="cart_id, item_id"
+                constraintName="uq_cart_item_cartid_itemid"/>
+    </changeSet>
 </databaseChangeLog>

@@ -1,9 +1,26 @@
 spring:
+  # JDBC for Liquibase
   r2dbc:
-    url: ${SPRING_DATASOURCE_URL:r2dbc:postgresql://localhost:5434/onlineshop}
+    url: ${SPRING_DATASOURCE_URL:r2dbc:postgresql://localhost:5432/onlineshop}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:12345}
 
   liquibase:
     enabled: true
     change-log: classpath:db/master/db.changelog-master.xml
+    url: jdbc:postgresql://localhost:5432/onlineshop
+    user: postgres
+    password: 12345
+
+  thymeleaf:
+    enabled: true
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false
+
+server:
+  port: 8080
+
+logging:
+  level:
+    liquibase: debug

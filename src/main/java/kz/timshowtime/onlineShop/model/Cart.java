@@ -1,29 +1,24 @@
 package kz.timshowtime.onlineShop.model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import kz.timshowtime.onlineShop.model.manyToMany.CartItem;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-import java.util.ArrayList;
-import java.util.List;
-
-@Entity
+@Table("cart")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Cart {
+
     @Id
-    private int id = 1;
+    private Long id;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CartItem> items = new ArrayList<>();
-
+    @Column("total_price")
     private int totalPrice;
+
 }

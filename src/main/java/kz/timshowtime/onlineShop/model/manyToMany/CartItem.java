@@ -1,37 +1,34 @@
 package kz.timshowtime.onlineShop.model.manyToMany;
 
-import jakarta.persistence.*;
-import kz.timshowtime.onlineShop.model.Cart;
-import kz.timshowtime.onlineShop.model.Item;
-import kz.timshowtime.onlineShop.model.manyToMany.Embedded.CartItemId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "cart_items")
-@IdClass(CartItemId.class)
+@Table("cart_items")
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 public class CartItem {
 
     @Id
-    @ManyToOne
-    @JoinColumn(name = "cart_id")
-    private Cart cart;
+    private Long id;
 
-    @Id
-    @ManyToOne
-    @JoinColumn(name = "item_id")
-    private Item item;
+    @Column("cart_id")
+    private Long cartId;
 
+    @Column("item_id")
+    private Long itemId;
+
+    @Column("quantity")
     private int quantity;
 
+    @Column("create_dt")
     private LocalDateTime createDt;
 }

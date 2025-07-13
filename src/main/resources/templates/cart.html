@@ -2,6 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
+    <meta charset="UTF-8">
     <title>Корзина товаров</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/cart.css}">
 </head>
@@ -21,7 +22,7 @@
             <div class="cart-item-title" th:text="${item.getName()}"></div>
             <div class="cart-item-price" th:text="${item.getReadablePrice()}"></div>
             <div class="cart-item-description" th:text="${item.getTextPreview()}"></div>
-            <form th:action="${'/items/'+item.getId()}" method="post" class="cart-item-actions">
+            <form th:action="${'/cart/'+item.getId()}" method="post" class="cart-item-actions">
                 <input type="hidden" name="source" value="cart/items"/>
 
                 <div class="quantity-actions">

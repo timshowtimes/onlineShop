@@ -1,33 +1,32 @@
 package kz.timshowtime.onlineShop.model.manyToMany;
 
-import jakarta.persistence.*;
-import kz.timshowtime.onlineShop.model.Item;
-import kz.timshowtime.onlineShop.model.Order;
-import kz.timshowtime.onlineShop.model.manyToMany.Embedded.OrderItemId;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-@Entity
 @Table(name = "orders_items")
-@IdClass(OrderItemId.class)
 @Getter
 @Setter
+@Builder
 public class OrdersItem {
 
     @Id
-    @ManyToOne
-    @JoinColumn(name = "order_id")
-    private Order order;
+    private Long id;
 
-    @Id
-    @ManyToOne
-    @JoinColumn(name = "item_id")
-    private Item item;
+    @Column("order_id")
+    private Long orderId;
 
+    @Column("item_id")
+    private Long itemId;
+
+    @Column("quantity")
     private int quantity;
 
-    public String getReadablePriceByQuantity() {
-        return String.format("%,d", item.getPrice() * quantity).replace(',', ' ');
-    }
+//    public String getReadablePriceByQuantity() {
+//        return String.format("%,d", item.getPrice() * quantity).replace(',', ' ');
+//    }
 }
 
