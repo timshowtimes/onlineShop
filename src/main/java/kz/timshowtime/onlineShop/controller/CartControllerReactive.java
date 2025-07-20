@@ -15,7 +15,6 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +65,6 @@ public class CartControllerReactive {
 
         return exchange.getFormData().flatMap(form -> {
 
-            // значения из формы (с дефолтом для action)
             String action = Optional.ofNullable(form.getFirst("action"))
                     .orElse("plus");
             String source = form.getFirst("source");
@@ -99,7 +97,7 @@ public class CartControllerReactive {
                             }
                             case "delete" -> {
                                 cart.setTotalPrice(cart.getTotalPrice() - item.getPrice() * quantity);
-                                quantity = 0;              // всё убрать
+                                quantity = 0;
                             }
                         }
 

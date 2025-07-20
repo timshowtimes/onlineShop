@@ -40,10 +40,10 @@ public class Item {
         return String.format("%,d тг.", price).replace(',', ' ');
     }
 
-//    public String getReadablePriceByQuantity() {
-//        return String.format("%,d тг.", price * quantity).replace(',', ' ');
-//
-//    }
+    public String getReadablePriceByQuantity() {
+        return String.format("%,d тг.", price * quantity).replace(',', ' ');
+
+    }
 
     public String getValidName() {
         return getValidLength(name, 40);

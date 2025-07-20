@@ -30,7 +30,7 @@ public class Order {
     private LocalDateTime createDt;
 
     @Transient
-    private List<OrdersItem> items = new ArrayList<>();
+    private List<Item> items = new ArrayList<>();
 
     public String getTotalPrice() {
         return String.format("%,d тг", totalPrice).replace(",", " ");

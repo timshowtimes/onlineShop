@@ -1,12 +1,14 @@
 package kz.timshowtime.onlineShop.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ItemDto {
     private Long id;
     private String name;
@@ -25,6 +27,11 @@ public class ItemDto {
 
     public String getReadablePrice() {
         return String.format("%,d тг.", price).replace(',', ' ');
+    }
+
+    public String getReadablePriceByQuantity() {
+        return String.format("%,d тг.", price * quantity).replace(',', ' ');
+
     }
 
     public String getValidName() {

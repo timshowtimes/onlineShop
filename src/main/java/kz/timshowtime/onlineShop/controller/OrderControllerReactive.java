@@ -1,5 +1,6 @@
 package kz.timshowtime.onlineShop.controller;
 
+import kz.timshowtime.onlineShop.service.OrderItemService;
 import kz.timshowtime.onlineShop.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -14,12 +15,12 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/orders")
 @RequiredArgsConstructor
 public class OrderControllerReactive {
-    public final OrderService orderService;
+    private final OrderService orderService;
+    private final OrderItemService orderItemService;
 
     @GetMapping
     public Mono<String> all(Model model) {
-        return orderService.findAll()
-                .collectList()
+        return orderItemService.findAllOrdersWithItems()
                 .map(orders -> {
                     model.addAttribute("orders", orders);
                     return "orders";

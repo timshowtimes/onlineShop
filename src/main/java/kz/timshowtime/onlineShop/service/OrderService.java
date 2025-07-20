@@ -36,12 +36,12 @@ public class OrderService {
         SELECT i.id, i.name, i.price, i.description, i.preview, oi.quantity
         FROM item i
         JOIN orders_items oi ON i.id = oi.item_id
-        WHERE oi.order_id = ?
+        WHERE oi.order_id = :orderId
     """;
 
         return template.getDatabaseClient()
                 .sql(sql)
-                .bind(0, orderId)
+                .bind("orderId", orderId)
                 .map((row, meta) -> new ItemDto(
                         row.get("id", Long.class),
                         row.get("name", String.class),

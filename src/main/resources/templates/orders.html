@@ -20,9 +20,8 @@
         </h2>
 
         <ul class="order-items">
-            <li th:each="item : ${order.getItems()}"
-            <li>
-                <span class="item-name" th:text="${item.getItem().getName()}"></span>
+            <li th:each="item : ${order.getItems()}">
+                <span class="item-name" th:text="${item.getName()}"></span>
                 <span class="item-quantity" th:text="${' (' + item.getQuantity() + ' шт.)'}"></span>
                 <span class="item-price" th:text="${item.getReadablePriceByQuantity()}"></span>
             </li>

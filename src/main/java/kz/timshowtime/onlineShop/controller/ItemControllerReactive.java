@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.http.codec.multipart.FormFieldPart;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -98,8 +99,6 @@ public class ItemControllerReactive {
         Mono<Integer> quantityMono = cartItemService.findQuantityByItemId(id);
         Mono<Item> itemMono = itemService.findById(id);
 
-        System.out.println("==== CALLED NEW METHOD ====");
-
         return Mono.zip(itemMono, quantityMono)
                 .map(tuple -> {
                     return Rendering.view("item")
@@ -114,26 +113,33 @@ public class ItemControllerReactive {
         return "item-add";
     }
 
-    @PostMapping("/upload")
-    public Mono<String> addItem(@RequestPart("image") FilePart image,
-                                @RequestPart("name") String name,
-                                @RequestPart("price") Integer price,
-                                @RequestPart("text") String text) {
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Mono<String> addItem(
+            @RequestPart("image") FilePart image,
+            @RequestPart("name") FormFieldPart namePart,
+            @RequestPart("price") FormFieldPart pricePart,
+            @RequestPart("text")  FormFieldPart textPart
+    ) {
+        String name        = namePart.value();
+        Integer price      = Integer.valueOf(pricePart.value());
+        String description = textPart.value();
 
         return DataBufferUtils.join(image.content())
-                .flatMap(dataBuffer -> {
-                    byte[] bytes = new byte[dataBuffer.readableByteCount()];
-                    dataBuffer.read(bytes);
-                    DataBufferUtils.release(dataBuffer); // ручное освобождение памяти (Netty)
+                .flatMap(buffer -> {
+                    byte[] bytes = new byte[buffer.readableByteCount()];
+                    buffer.read(bytes);
+                    DataBufferUtils.release(buffer);
 
                     Item item = Item.builder()
                             .preview(bytes)
                             .name(name)
                             .price(price)
-                            .description(text)
+                            .description(description)
                             .build();
 
-                    return itemService.save(item).thenReturn("redirect:/items");
+                    return itemService.save(item)
+                            .thenReturn("redirect:/items");
                 });
     }
+
 }
