@@ -1,0 +1,106 @@
+openapi: 3.1.0
+info:
+  title: Payments API
+  description: 'REST API сервиса платежей: получить баланс и списать сумму заказа'
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8082'
+tags:
+  - name: Wallets
+
+paths:
+  /api/v1/wallets/balance:
+    get:
+      tags: [Wallets]
+      operationId: getBalance
+      summary: Получить текущий баланс пользователя
+      responses:
+        '200':
+          description: Баланс найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceResponse'
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+
+  /api/v1/wallets/charge:
+    post:
+      tags: [Wallets]
+      operationId: charge
+      summary: Списать сумму заказа с баланса
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChargeRequest'
+      responses:
+        '200':
+          description: Списание успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChargeResult'
+        '409':
+          description: Недостаточно средств
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404': { $ref: '#/components/responses/NotFound' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+
+components:
+    schemas:
+      BalanceResponse:
+        type: object
+        required: [balance, currency]
+        properties:
+          balance: { type: number, format: double, minimum: 0 }
+          currency: { type: string, example: KZT }
+
+      ChargeRequest:
+        type: object
+        required: [amount, orderId]
+        properties:
+          amount: { type: number, format: double, minimum: 0.01, description: Итоговая сумма заказа для списания }
+          orderId: { type: number, description: ID заказа }
+
+      ChargeResult:
+        type: object
+        required: [paymentId, debited, balanceAfter, status]
+        properties:
+          paymentId: { type: string, format: uuid }
+          debited: { type: number, format: double, minimum: 0 }
+          balanceAfter: { type: number, format: double }
+          status:
+            type: string
+            enum: [APPROVED, DECLINED]
+          message: { type: string }
+
+      ErrorResponse:
+        type: object
+        required: [code, message]
+        properties:
+          code: { type: string, example: INSUFFICIENT_FUNDS }
+          message: { type: string, example: Недостаточно средств }
+
+    responses:
+      BadRequest:
+        description: Неверный запрос
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ErrorResponse'}
+      NotFound:
+        description: Кошелек не найден
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ErrorResponse'}
+
+      ServiceUnavailable:
+        description: Сервис платежей недоступен
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ErrorResponse'}
