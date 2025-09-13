@@ -11,7 +11,7 @@ tags:
 paths:
   /api/v1/wallets/balance:
     get:
-      tags: [Wallets]
+      tags: [ Wallets ]
       operationId: getBalance
       summary: Получить текущий баланс пользователя
       responses:
@@ -26,7 +26,7 @@ paths:
 
   /api/v1/wallets/charge:
     post:
-      tags: [Wallets]
+      tags: [ Wallets ]
       operationId: charge
       summary: Списать сумму заказа с баланса
       requestBody:
@@ -53,54 +53,54 @@ paths:
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
 
 components:
-    schemas:
-      BalanceResponse:
-        type: object
-        required: [balance, currency]
-        properties:
-          balance: { type: number, format: double, minimum: 0 }
-          currency: { type: string, example: KZT }
+  schemas:
+    BalanceResponse:
+      type: object
+      required: [ balance, currency ]
+      properties:
+        balance: { type: number, format: double, minimum: 0 }
+        currency: { type: string, example: KZT }
 
-      ChargeRequest:
-        type: object
-        required: [amount, orderId]
-        properties:
-          amount: { type: number, format: double, minimum: 0.01, description: Итоговая сумма заказа для списания }
-          orderId: { type: number, description: ID заказа }
+    ChargeRequest:
+      type: object
+      required: [ amount, orderId ]
+      properties:
+        amount: { type: number, format: double, minimum: 0.01, description: Итоговая сумма заказа для списания }
+        orderId: { type: number, description: ID заказа }
 
-      ChargeResult:
-        type: object
-        required: [paymentId, debited, balanceAfter, status]
-        properties:
-          paymentId: { type: string, format: uuid }
-          debited: { type: number, format: double, minimum: 0 }
-          balanceAfter: { type: number, format: double }
-          status:
-            type: string
-            enum: [APPROVED, DECLINED]
-          message: { type: string }
+    ChargeResult:
+      type: object
+      required: [ paymentId, debited, balanceAfter, status ]
+      properties:
+        paymentId: { type: string, format: uuid }
+        debited: { type: number, format: double, minimum: 0 }
+        balanceAfter: { type: number, format: double }
+        status:
+          type: string
+          enum: [ APPROVED, DECLINED ]
+        message: { type: string }
 
-      ErrorResponse:
-        type: object
-        required: [code, message]
-        properties:
-          code: { type: string, example: INSUFFICIENT_FUNDS }
-          message: { type: string, example: Недостаточно средств }
+    ErrorResponse:
+      type: object
+      required: [ code, message ]
+      properties:
+        code: { type: string, example: INSUFFICIENT_FUNDS }
+        message: { type: string, example: Недостаточно средств }
 
-    responses:
-      BadRequest:
-        description: Неверный запрос
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ErrorResponse'}
-      NotFound:
-        description: Кошелек не найден
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ErrorResponse'}
+  responses:
+    BadRequest:
+      description: Неверный запрос
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    NotFound:
+      description: Кошелек не найден
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
 
-      ServiceUnavailable:
-        description: Сервис платежей недоступен
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ErrorResponse'}
+    ServiceUnavailable:
+      description: Сервис платежей недоступен
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }

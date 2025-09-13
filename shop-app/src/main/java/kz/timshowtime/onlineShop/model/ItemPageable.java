@@ -1,7 +1,9 @@
 package kz.timshowtime.onlineShop.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 
+@Data
 @AllArgsConstructor
 public class ItemPageable {
     private int pageNumber;

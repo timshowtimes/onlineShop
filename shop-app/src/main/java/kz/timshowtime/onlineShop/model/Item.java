@@ -37,11 +37,11 @@ public class Item {
     }
 
     public String getReadablePrice() {
-        return String.format("%,d тг.", price).replace(',', ' ');
+        return String.format("%,d ₸.", price).replace(',', ' ');
     }
 
     public String getReadablePriceByQuantity() {
-        return String.format("%,d тг.", price * quantity).replace(',', ' ');
+        return String.format("%,d ₸.", price * quantity).replace(',', ' ');
 
     }
 

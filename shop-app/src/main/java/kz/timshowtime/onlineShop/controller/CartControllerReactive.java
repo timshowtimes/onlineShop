@@ -6,6 +6,10 @@ import kz.timshowtime.onlineShop.model.Item;
 import kz.timshowtime.onlineShop.model.Order;
 import kz.timshowtime.onlineShop.model.manyToMany.CartItem;
 import kz.timshowtime.onlineShop.model.manyToMany.OrdersItem;
+import kz.timshowtime.onlineShop.paymentsclient.ApiClient;
+import kz.timshowtime.onlineShop.paymentsclient.api.WalletsApi;
+import kz.timshowtime.onlineShop.paymentsclient.model.BalanceResponse;
+import kz.timshowtime.onlineShop.paymentsclient.model.ChargeRequest;
 import kz.timshowtime.onlineShop.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -15,6 +19,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -33,28 +38,37 @@ public class CartControllerReactive {
     private final OrderItemService orderItemService;
 
     @GetMapping("/items")
-    public Mono<String> getItems(Model model) {
-        Flux<ItemDto> itemFlux = cartItemService.getAllItems();
+    public Mono<String> getItems(Model model,
+                                 @RequestParam(name = "cache", defaultValue = "true") Boolean cache,
+                                 @RequestParam(name = "evictById", defaultValue = "0") Long evictById) {
+        Flux<ItemDto> itemFlux = cartItemService.getAllItems(cache, evictById);
         Mono<Cart> cartMono = cartService.findById(1);
+        Mono<BalanceResponse> balanceResponseMono = new WalletsApi().getBalance();
 
         Mono<List<ItemDto>> itemListMono = itemFlux.collectList();
 
-        return Mono.zip(itemListMono, cartMono)
+        return Mono.zip(itemListMono, cartMono, balanceResponseMono)
                 .map(tuple -> {
                     List<ItemDto> items = tuple.getT1();
                     Cart cart = tuple.getT2();
+                    BalanceResponse balanceResponse = tuple.getT3();
+                    String readableBalance = String.format("%,.0f %s", balanceResponse.getBalance(), balanceResponse.getCurrency())
+                            .replace(',', ' ');
 
                     Map<Long, Integer> quantityMap = items.stream()
                             .collect(Collectors.toMap(ItemDto::getId, ItemDto::getQuantity));
 
-                    String total = String.format("%,d тг", cart.getTotalPrice()).replace(',', ' ');
-
+                    String readableTotal = String.format("%,d ₸", cart.getTotalPrice()).replace(',', ' ');
+                    int total = cart.getTotalPrice();
 
                     model.addAttribute("items", items);
                     model.addAttribute("quantities", quantityMap);
+                    model.addAttribute("readableTotal", readableTotal);
+                    model.addAttribute("readableBalance", readableBalance);
                     model.addAttribute("total", total);
+                    model.addAttribute("balance", balanceResponse.getBalance());
 
-                    return "cart"; // имя HTML-шаблона
+                    return "cart";
                 });
 
     }
@@ -69,21 +83,21 @@ public class CartControllerReactive {
                     .orElse("plus");
             String source = form.getFirst("source");
 
-            Mono<Cart>   cartMono = cartService.findById(1L);
-            Mono<Item>   itemMono = itemService.findById(itemId);
-            Mono<Integer>qtyMono  = cartItemService
+            Mono<Cart> cartMono = cartService.findById(1L);
+            Mono<ItemDto> itemMono = itemService.findById(itemId);
+            Mono<Integer> qtyMono = cartItemService
                     .findQuantityByItemId(itemId)   // текущее кол‑во
                     .defaultIfEmpty(0);
 
             return Mono.zip(cartMono, itemMono, qtyMono)
                     .flatMap(tuple -> {
 
-                        Cart cart       = tuple.getT1();
-                        Item item       = tuple.getT2();
-                        int  quantity   = tuple.getT3();
+                        Cart cart = tuple.getT1();
+                        ItemDto item = tuple.getT2();
+                        int quantity = tuple.getT3();
 
                         if ("minus".equals(action) && quantity == 0) {
-                            return Mono.just("redirect:/" + source);
+                            return Mono.just("redirect:/" + source + "?cache=false");
                         }
 
                         switch (action) {
@@ -119,7 +133,8 @@ public class CartControllerReactive {
                                     .then();
                         }
 
-                        return persist.thenReturn("redirect:/" + source);
+                        return persist.thenReturn("redirect:/" + source
+                                + "?" + (quantity == 0 ? "evictById=" + itemId : "cache=false"));
                     });
         });
     }
@@ -129,11 +144,13 @@ public class CartControllerReactive {
     public Mono<String> buy() {
         Mono<Cart> cartMono = cartService.findById(1);
         Mono<Long> countMono = orderService.count();
+        Mono<Long> nextOrderIdMono = orderService.getNextOrderId();
 
-        return Mono.zip(cartMono, countMono)
+        return Mono.zip(cartMono, countMono, nextOrderIdMono)
                 .flatMap(tuple -> {
                     Cart cart = tuple.getT1();
                     Long count = tuple.getT2();
+                    Long nextOrderId = tuple.getT3();
 
                     return cartItemService.getCartItems(cart.getId())
                             .collectList()
@@ -143,15 +160,24 @@ public class CartControllerReactive {
 
                                 String orderName = "Заказ №" + System.currentTimeMillis() + (count + 1);
 
-                                return createAndSaveOrder(orderName, itemsIdWithQuantities, cart.getTotalPrice())
-                                        .flatMap(savedOrder ->
-                                                cartItemService.deleteAllByCart(cart)
-                                                        .then(Mono.defer(() -> {
-                                                            cart.setTotalPrice(0);
-                                                            return cartService.save(cart);
-                                                        }))
-                                                        .thenReturn("redirect:/orders/" + savedOrder.getId() + "?new=true")
-                                        );
+                                ApiClient apiClient = new ApiClient();
+                                WalletsApi walletsApi = new WalletsApi(apiClient);
+                                ChargeRequest chargeRequest = new ChargeRequest();
+                                chargeRequest.setAmount((double) cart.getTotalPrice());
+                                chargeRequest.setOrderId(BigDecimal.valueOf(nextOrderId));
+
+                                return walletsApi.charge(chargeRequest)
+                                        .flatMap(chargeResult ->
+                                                createAndSaveOrder(orderName, itemsIdWithQuantities, cart.getTotalPrice())
+                                                .flatMap(savedOrder ->
+                                                        cartItemService.deleteAllByCart(cart)
+                                                                .then(Mono.defer(() -> {
+                                                                    cart.setTotalPrice(0);
+                                                                    return cartService.save(cart);
+                                                                }))
+                                                                .thenReturn("redirect:/orders/" + savedOrder.getId() + "?new=true")
+                                                ))
+                                        .onErrorResume(ex -> Mono.error(new RuntimeException("Ошибка при списании: " + ex.getMessage(), ex)));
 
                             });
                 });

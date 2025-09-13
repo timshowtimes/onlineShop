@@ -162,7 +162,7 @@ label {
 
 .controls-container {
     max-width: 1219px;
-    margin: 0 auto 30px auto;
+    margin: 1.1em auto 30px auto;
     background-color: #f9f9f9;
     border-radius: 10px;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
@@ -268,4 +268,15 @@ label {
 
 .sort-select {
     margin-left: 25px;
+}
+
+a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+}
+
+a:hover {
+    color: #007acc;
+    text-decoration: none;
 }

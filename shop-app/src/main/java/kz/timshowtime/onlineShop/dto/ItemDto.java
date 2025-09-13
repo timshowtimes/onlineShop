@@ -1,5 +1,7 @@
 package kz.timshowtime.onlineShop.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,19 +27,23 @@ public class ItemDto {
         this.preview = preview;
     }
 
+    @JsonIgnore
     public String getReadablePrice() {
-        return String.format("%,d тг.", price).replace(',', ' ');
+        return String.format("%,d ₸.", price).replace(',', ' ');
     }
 
+    @JsonIgnore
     public String getReadablePriceByQuantity() {
-        return String.format("%,d тг.", price * quantity).replace(',', ' ');
+        return String.format("%,d ₸.", price * quantity).replace(',', ' ');
 
     }
 
+    @JsonIgnore
     public String getValidName() {
         return getValidLength(name, 40);
     }
 
+    @JsonIgnore
     public String getTextPreview() {
         return getValidLength(description, 83);
     }

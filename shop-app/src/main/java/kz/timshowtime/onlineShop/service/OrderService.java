@@ -31,6 +31,10 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
+    public Mono<Long> getNextOrderId() {
+        return orderRepository.getNextOrderId();
+    }
+
     public Flux<ItemDto> getAllItemsByOrder(long orderId) {
         String sql = """
         SELECT i.id, i.name, i.price, i.description, i.preview, oi.quantity

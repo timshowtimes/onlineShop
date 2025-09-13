@@ -33,6 +33,6 @@ public class Order {
     private List<Item> items = new ArrayList<>();
 
     public String getTotalPrice() {
-        return String.format("%,d тг", totalPrice).replace(",", " ");
+        return String.format("%,d ₸", totalPrice).replace(",", " ");
     }
 }

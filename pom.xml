@@ -12,13 +12,13 @@
 
 	<groupId>kz.timshowtime</groupId>
 	<artifactId>onlineShop</artifactId>
-	<version>0.0.6-SNAPSHOT</version>
+	<version>3.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>onlineShop</name>
 	<properties>
 		<java.version>21</java.version>
-		<openapi.generator.version>7.5.0</openapi.generator.version>
+		<openapi.generator.version>7.15.0</openapi.generator.version>
 <!--		<spec.path>C:/Practicum/onlineShop/payments-spec/src/main/resources/openapi/payments.yaml</spec.path>-->
 	</properties>
 

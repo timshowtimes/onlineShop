@@ -45,35 +45,42 @@
             <artifactId>payments-spec</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>2.2.21</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>0.2.6</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.1</version>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>kz.timshowtime.paymentsapp.PaymentsAppApplication</mainClass>
+                </configuration>
                 <executions>
                     <execution>
-                        <id>copy-openapi-spec</id>
-                        <phase>validate</phase> <!-- раньше generate-sources -->
-                        <goals><goal>copy-resources</goal></goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/spec/openapi</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <!-- идём в соседний модуль через родителя -->
-                                    <directory>${project.parent.basedir}/payments-spec/src/main/resources/openapi</directory>
-                                    <includes>
-                                        <include>payments.yaml</include>
-                                    </includes>
-                                    <filtering>false</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
-
             <!-- B) ГЕНЕРАЦИЯ СЕРВЕРНЫХ ЗАГЛУШЕК -->
             <plugin>
                 <groupId>org.openapitools</groupId>
@@ -88,15 +95,16 @@
                         </goals>
                         <configuration>
                             <!-- Путь до YAML -->
-                            <inputSpec>${project.build.directory}/spec/openapi/payments.yaml</inputSpec>
+                            <inputSpec>${basedir}/../payments-spec/src/main/resources/openapi/payments.yaml</inputSpec>
 
-                            <!-- <<< ЭТО ОБЯЗАТЕЛЬНО >>> -->
+                            <!-- <inputSpec>../payments-spec/src/main/resources/openapi/payments.yaml</inputSpec>-->
                             <generatorName>spring</generatorName>
 
                             <output>${project.build.directory}/generated-sources/openapi</output>
                             <apiPackage>kz.timshowtime.paymentsapp.gen.api</apiPackage>
                             <modelPackage>kz.timshowtime.paymentsapp.gen.model</modelPackage>
                             <addCompileSourceRoot>true</addCompileSourceRoot>
+
 
                             <configOptions>
                                 <useSpringBoot3>true</useSpringBoot3>
@@ -106,17 +114,15 @@
                                 <delegatePattern>true</delegatePattern>
                                 <useTags>true</useTags>
                             </configOptions>
+
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
+
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
 
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
         </plugins>
     </build>
 

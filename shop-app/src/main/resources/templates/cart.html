@@ -8,9 +8,20 @@
 </head>
 
 <body>
+<div class="balance-warning"
+     th:if="${balance < total}">
+    ⚠ Недостаточно средств: пополните баланс, чтобы совершить покупку.
+</div>
+
 <div class="cart-header">
-    <a href="/items"><b>ГЛАВНАЯ &cudarrr;</b></a>
-    <a href="/orders"><b>ЗАКАЗЫ &cudarrr;</b></a>
+    <div class="cart-header-left">
+        <a href="/items"><b>ГЛАВНАЯ &cudarrr;</b></a>
+        <a href="/orders"><b>ЗАКАЗЫ &cudarrr;</b></a>
+    </div>
+    <div class="cart-balance">
+        <span class="balance-label">Баланс:</span>
+        <span class="balance-value" th:text="${readableBalance}"></span>
+    </div>
 </div>
 
 <div class="cart-container" th:each="itemsRow : ${items}">
@@ -40,10 +51,11 @@
 
 <div class="cart-summary">
     <div class="cart-total">
-        <b th:text="'Итого: ' + ${total}"></b>
+        <b th:text="'Итого: ' + ${readableTotal}"></b>
     </div>
+
     <form action="/cart/buy" method="post">
-        <button class="buy-btn" th:disabled="${total.equals('0 тг.')}">Купить</button>
+        <button class="buy-btn"  th:disabled="${total == 0 or balance < total}">Купить</button>
     </form>
 </div>
 

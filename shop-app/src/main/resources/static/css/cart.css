@@ -6,6 +6,28 @@ body {
     color: #333;
 }
 
+.cart-balance {
+    margin-top: -4px;
+    padding: 10px;
+    background-color: #f0f8ff;
+    border: 1px solid #007acc;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.balance-label {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-right: 8px;
+    color: #333;
+}
+
+.balance-value {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #007acc;
+}
+
 a {
     text-decoration: none;
     color: #007BFF;
@@ -18,9 +40,29 @@ a:hover {
 
 .cart-header {
     display: flex;
-    justify-content: flex-end;
-    gap: 20px;
-    margin-bottom: 20px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 10px;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 1.5em
+}
+
+
+.cart-header-left a {
+    margin-right: 15px;
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+}
+
+.cart-header-left a:hover {
+    color: #007acc;
+    text-decoration: none;
+}
+
+.cart-header-right {
+    font-size: 1.2em;
+    font-weight: bold;
 }
 
 .cart-container {
@@ -153,4 +195,13 @@ a:hover {
 .buy-btn:disabled {
     background-color: #ccc;
     cursor: not-allowed;
+}
+
+.balance-warning {
+    padding: 10px;
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    border-radius: 6px;
+    color: #856404;
+    font-size: 16px;
 }

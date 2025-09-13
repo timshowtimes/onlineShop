@@ -43,6 +43,8 @@ public class ItemControllerReactive {
                             @RequestParam(value = "sort", defaultValue = "NO") SortName sortValue,
                             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
                             @RequestParam(value = "pageNumber", defaultValue = "0") Integer pageNumber,
+                            @RequestParam(value = "cache", defaultValue = "true") Boolean cache,
+                            @RequestParam(value = "evictById", defaultValue = "0") Long evictById,
                             Model model) {
 
         String keyword = (name == null || name.isBlank()) ? "" : name;
@@ -54,7 +56,7 @@ public class ItemControllerReactive {
 
         Mono<Long> totalItemCountMono = itemService.count();
         Mono<List<ItemDto>> itemsMono = itemService.findAll(keyword, pageable).collectList();
-        Mono<List<ItemDto>> cartItemsMono = cartItemService.getAllItems().collectList();
+        Mono<List<ItemDto>> cartItemsMono = cartItemService.getAllItems(cache, evictById).collectList();
         Mono<Integer> totalQuantityMono = cartItemService.getTotalQuantity();
 
         return Mono.zip(itemsMono, totalItemCountMono, cartItemsMono, totalQuantityMono)
@@ -65,6 +67,8 @@ public class ItemControllerReactive {
                     Integer totalQuantity = tuple.getT4();
 
                     ItemPageable paging = ItemPageable.getPageable(pageNumber, pageSize, totalItemCount);
+
+                    System.out.println("ItemPageable: " + paging);
 
                     // карта количества товаров в корзине
                     Map<Long, Integer> quantityMap = cartItems.stream()
@@ -97,15 +101,13 @@ public class ItemControllerReactive {
     @GetMapping("/{id}")
     public Mono<Rendering> getOne(@PathVariable("id") Long id) {
         Mono<Integer> quantityMono = cartItemService.findQuantityByItemId(id);
-        Mono<Item> itemMono = itemService.findById(id);
+        Mono<ItemDto> itemMono = itemService.findById(id);
 
         return Mono.zip(itemMono, quantityMono)
-                .map(tuple -> {
-                    return Rendering.view("item")
-                            .modelAttribute("item", tuple.getT1())
-                            .modelAttribute("quantity", tuple.getT2())
-                            .build();
-                });
+                .map(tuple -> Rendering.view("item")
+                        .modelAttribute("item", tuple.getT1())
+                        .modelAttribute("quantity", tuple.getT2())
+                        .build());
     }
 
     @GetMapping("/add-page")
