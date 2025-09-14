@@ -8,8 +8,14 @@
 </head>
 
 <body>
+
 <div class="balance-warning"
-     th:if="${balance < total}">
+     th:if="${balance < 0}">
+    ⚠ Сервис платежей сейчас недоступен.
+</div>
+
+<div class="balance-warning"
+     th:if="${balance >= 0 and balance < total}">
     ⚠ Недостаточно средств: пополните баланс, чтобы совершить покупку.
 </div>
 

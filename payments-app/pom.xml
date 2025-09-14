@@ -12,6 +12,7 @@
 
     <artifactId>payments-app</artifactId>
     <name>payments-app</name>
+    <packaging>jar</packaging>
 
     <dependencies>
         <!-- выбрал WebFlux, чтобы соответствовать вашему стеку -->
@@ -72,6 +73,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <mainClass>kz.timshowtime.paymentsapp.PaymentsAppApplication</mainClass>
+                    <classifier>exec</classifier>
                 </configuration>
                 <executions>
                     <execution>
@@ -95,9 +97,9 @@
                         </goals>
                         <configuration>
                             <!-- Путь до YAML -->
-                            <inputSpec>${basedir}/../payments-spec/src/main/resources/openapi/payments.yaml</inputSpec>
+<!--                            <inputSpec>${basedir}/../payments-spec/src/main/resources/openapi/payments.yaml</inputSpec>-->
 
-                            <!-- <inputSpec>../payments-spec/src/main/resources/openapi/payments.yaml</inputSpec>-->
+                             <inputSpec>payments-spec/src/main/resources/openapi/payments.yaml</inputSpec>
                             <generatorName>spring</generatorName>
 
                             <output>${project.build.directory}/generated-sources/openapi</output>

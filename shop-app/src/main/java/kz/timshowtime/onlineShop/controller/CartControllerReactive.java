@@ -1,17 +1,17 @@
 package kz.timshowtime.onlineShop.controller;
 
 import kz.timshowtime.onlineShop.dto.ItemDto;
+import kz.timshowtime.onlineShop.factory.WalletsApiFactory;
 import kz.timshowtime.onlineShop.model.Cart;
-import kz.timshowtime.onlineShop.model.Item;
 import kz.timshowtime.onlineShop.model.Order;
 import kz.timshowtime.onlineShop.model.manyToMany.CartItem;
 import kz.timshowtime.onlineShop.model.manyToMany.OrdersItem;
-import kz.timshowtime.onlineShop.paymentsclient.ApiClient;
 import kz.timshowtime.onlineShop.paymentsclient.api.WalletsApi;
 import kz.timshowtime.onlineShop.paymentsclient.model.BalanceResponse;
 import kz.timshowtime.onlineShop.paymentsclient.model.ChargeRequest;
 import kz.timshowtime.onlineShop.service.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/cart")
 public class CartControllerReactive {
 
@@ -36,6 +37,7 @@ public class CartControllerReactive {
     private final CartService cartService;
     private final OrderService orderService;
     private final OrderItemService orderItemService;
+    private final WalletsApiFactory walletsApiFactory;
 
     @GetMapping("/items")
     public Mono<String> getItems(Model model,
@@ -43,7 +45,13 @@ public class CartControllerReactive {
                                  @RequestParam(name = "evictById", defaultValue = "0") Long evictById) {
         Flux<ItemDto> itemFlux = cartItemService.getAllItems(cache, evictById);
         Mono<Cart> cartMono = cartService.findById(1);
-        Mono<BalanceResponse> balanceResponseMono = new WalletsApi().getBalance();
+        Mono<BalanceResponse> balanceResponseMono = new WalletsApi().getBalance()
+                .onErrorResume(ex -> {
+                    BalanceResponse fallback = new BalanceResponse()
+                            .balance(-1.0)
+                            .currency(null);
+                    return Mono.just(fallback);
+                });
 
         Mono<List<ItemDto>> itemListMono = itemFlux.collectList();
 
@@ -52,7 +60,9 @@ public class CartControllerReactive {
                     List<ItemDto> items = tuple.getT1();
                     Cart cart = tuple.getT2();
                     BalanceResponse balanceResponse = tuple.getT3();
-                    String readableBalance = String.format("%,.0f %s", balanceResponse.getBalance(), balanceResponse.getCurrency())
+                    String readableBalance = balanceResponse.getBalance() >= 0
+                            ? String.format("%,.0f %s", balanceResponse.getBalance(), balanceResponse.getCurrency())
+                            : "0,(Недоступно)"
                             .replace(',', ' ');
 
                     Map<Long, Integer> quantityMap = items.stream()
@@ -151,6 +161,7 @@ public class CartControllerReactive {
                     Cart cart = tuple.getT1();
                     Long count = tuple.getT2();
                     Long nextOrderId = tuple.getT3();
+                    double totalPrice = cart.getTotalPrice();
 
                     return cartItemService.getCartItems(cart.getId())
                             .collectList()
@@ -160,23 +171,26 @@ public class CartControllerReactive {
 
                                 String orderName = "Заказ №" + System.currentTimeMillis() + (count + 1);
 
-                                ApiClient apiClient = new ApiClient();
-                                WalletsApi walletsApi = new WalletsApi(apiClient);
+                                WalletsApi walletsApi = walletsApiFactory.create();
                                 ChargeRequest chargeRequest = new ChargeRequest();
-                                chargeRequest.setAmount((double) cart.getTotalPrice());
+                                chargeRequest.setAmount(totalPrice);
                                 chargeRequest.setOrderId(BigDecimal.valueOf(nextOrderId));
 
                                 return walletsApi.charge(chargeRequest)
+                                        .doOnSuccess(result -> log.debug("Списание успешно, результат: {}", result))
                                         .flatMap(chargeResult ->
                                                 createAndSaveOrder(orderName, itemsIdWithQuantities, cart.getTotalPrice())
-                                                .flatMap(savedOrder ->
-                                                        cartItemService.deleteAllByCart(cart)
-                                                                .then(Mono.defer(() -> {
-                                                                    cart.setTotalPrice(0);
-                                                                    return cartService.save(cart);
-                                                                }))
-                                                                .thenReturn("redirect:/orders/" + savedOrder.getId() + "?new=true")
-                                                ))
+                                                        .doOnSuccess(order -> log.debug("Заказ сохранен, id заказа: {}", order.getId()))
+                                                        .flatMap(savedOrder ->
+                                                                cartItemService.deleteAllByCart(cart)
+                                                                        .doOnSuccess(v -> log.debug("Корзина очищена."))
+                                                                        .then(Mono.defer(() -> {
+                                                                            cart.setTotalPrice(0);
+                                                                            return cartService.save(cart);
+                                                                        }))
+                                                                        .doOnSuccess(v -> log.debug("Общая сумма корзины обнулена."))
+                                                                        .thenReturn("redirect:/orders/" + savedOrder.getId() + "?new=true")
+                                                        ))
                                         .onErrorResume(ex -> Mono.error(new RuntimeException("Ошибка при списании: " + ex.getMessage(), ex)));
 
                             });

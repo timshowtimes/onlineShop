@@ -95,6 +95,13 @@
         </dependency>
 
         <dependency>
+            <groupId>kz.timshowtime</groupId>
+            <artifactId>payments-app</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+
+        <dependency>
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
             <version>0.2.6</version>
@@ -119,11 +126,13 @@
                     <execution>
                         <id>generate-java-client</id>
                         <phase>generate-sources</phase>
-                        <goals><goal>generate</goal></goals>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
                         <configuration>
-                            <inputSpec>${basedir}/../payments-spec/src/main/resources/openapi/payments.yaml</inputSpec>
+                            <!--                            <inputSpec>${basedir}/../payments-spec/src/main/resources/openapi/payments.yaml</inputSpec>-->
 
-                            <!--                            <inputSpec>../payments-spec/src/main/resources/openapi/payments.yaml</inputSpec>-->
+                            <inputSpec>payments-spec/src/main/resources/openapi/payments.yaml</inputSpec>
                             <generatorName>java</generatorName>
                             <library>webclient</library>
                             <output>${project.build.directory}/generated-sources/openapi</output>

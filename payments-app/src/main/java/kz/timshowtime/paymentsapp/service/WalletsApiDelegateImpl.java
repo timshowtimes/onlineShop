@@ -17,7 +17,7 @@ import java.util.UUID;
 @Service
 public class WalletsApiDelegateImpl implements WalletsApiDelegate {
 
-    @Value("${account.balance}")
+    @Value("${account.balance:2000000.0}")
     private Double accountBalance;
 
     @Override
