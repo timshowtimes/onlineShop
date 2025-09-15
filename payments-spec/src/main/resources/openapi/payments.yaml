@@ -3,8 +3,8 @@ info:
   title: Payments API
   description: 'REST API сервиса платежей: получить баланс и списать сумму заказа'
   version: 1.0.0
-servers:
-  - url: 'http://localhost:8082'
+#servers:
+#  - url: 'http://localhost:8082'
 tags:
   - name: Wallets
 

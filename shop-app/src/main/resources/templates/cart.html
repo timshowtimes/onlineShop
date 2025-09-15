@@ -33,7 +33,7 @@
 <div class="cart-container" th:each="itemsRow : ${items}">
     <div class="cart-item" th:each="item : ${itemsRow}">
         <a th:href="${'/items/'+item.getId()}">
-            <img class="cart-item-image" th:src="@{'http://localhost:8080/items/images/'+ ${item.getId()}}" alt="Item image">
+            <img class="cart-item-image" th:src="@{'http://localhost:8888/items/images/'+ ${item.getId()}}" alt="Item image">
         </a>
         <div class="cart-item-info">
             <div class="cart-item-title" th:text="${item.getName()}"></div>

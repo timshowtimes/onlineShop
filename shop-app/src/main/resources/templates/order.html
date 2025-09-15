@@ -24,7 +24,7 @@
     <div class="order-items" th:each="item : ${items}">
         <div class="order-item-card">
             <a th:href="${'/items/'+ item.getId()}">
-                <img class="order-item-image" th:src="@{'http://localhost:8080/items/images/'+ ${item.getId()}}" alt="Item image">
+                <img class="order-item-image" th:src="@{'http://localhost:8888/items/images/'+ ${item.getId()}}" alt="Item image">
             </a>
             <div class="order-item-info">
                 <div class="order-item-text" th:text="${item.getTextPreview()}"></div>

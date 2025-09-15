@@ -100,7 +100,6 @@
             <version>${project.version}</version>
         </dependency>
 
-
         <dependency>
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
@@ -155,6 +154,11 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <arguments>
+                        <argument>--server.port=8888</argument>
+                    </arguments>
+                </configuration>
             </plugin>
         </plugins>
     </build>

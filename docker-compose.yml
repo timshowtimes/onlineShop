@@ -12,12 +12,29 @@ services:
     expose:
       - "5432"
 
-  app:
-    build: .
+  shop-app:
+    build:
+      context: ./shop-app
     networks:
       - network_onlineShop
     ports:
-      - "8080:8080"
+      - "8888:8888"
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - payments-app
+    environment:
+      - PAYMENTS_URL=http://payments-app:8082
+
+
+  payments-app:
+    build:
+      context: ./payments-app
+    networks:
+      - network_onlineShop
+    ports:
+      - "8082:8082"
     env_file:
       - .env
     depends_on:

@@ -12,9 +12,11 @@ import kz.timshowtime.onlineShop.paymentsclient.model.ChargeRequest;
 import kz.timshowtime.onlineShop.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -45,7 +47,7 @@ public class CartControllerReactive {
                                  @RequestParam(name = "evictById", defaultValue = "0") Long evictById) {
         Flux<ItemDto> itemFlux = cartItemService.getAllItems(cache, evictById);
         Mono<Cart> cartMono = cartService.findById(1);
-        Mono<BalanceResponse> balanceResponseMono = new WalletsApi().getBalance()
+        Mono<BalanceResponse> balanceResponseMono = walletsApiFactory.create().getBalance()
                 .onErrorResume(ex -> {
                     BalanceResponse fallback = new BalanceResponse()
                             .balance(-1.0)
@@ -177,6 +179,10 @@ public class CartControllerReactive {
                                 chargeRequest.setOrderId(BigDecimal.valueOf(nextOrderId));
 
                                 return walletsApi.charge(chargeRequest)
+                                        .onErrorResume(ex -> {
+                                            log.error("❌ Ошибка при обращении к payments-app", ex);
+                                            return Mono.error(new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Платёжный сервис недоступен"));
+                                        })
                                         .doOnSuccess(result -> log.debug("Списание успешно, результат: {}", result))
                                         .flatMap(chargeResult ->
                                                 createAndSaveOrder(orderName, itemsIdWithQuantities, cart.getTotalPrice())

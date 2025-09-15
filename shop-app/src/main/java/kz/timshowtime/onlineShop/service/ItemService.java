@@ -45,7 +45,6 @@ public class ItemService {
 
         String cacheKey = SHOWCASE_ITEMS_KEY + ":" + "page:%d:%d".formatted(pageable.getPageNumber(), pageable.getPageSize());
 
-
         if (!useCache) {
             log.info("⏩ [Витрина] Пропускаем кэш, идём сразу в БД (ключевые слова или сортировка активны)");
             return loadFromDb(keyword, pageable);
@@ -54,13 +53,13 @@ public class ItemService {
         return pageStringRedisTemplate.opsForValue().get(cacheKey)
                 .doOnNext(json -> log.info("✅ [Витрина] Данные получены из Redis-кэша по ключу {}", cacheKey))
                 .flatMapMany(json -> Mono.fromCallable(() ->
-                                mapper.readValue(json, new TypeReference<List<ItemDto>>() {
-                                }))
-                        .onErrorResume(ex -> {
-                            log.warn("Can't deserialize cached page {}, will reload from DB", cacheKey, ex);
-                            return Mono.empty();
-                        })
-                        .flatMapMany(Flux::fromIterable)
+                                        mapper.readValue(json, new TypeReference<List<ItemDto>>() {
+                                        }))
+                                .onErrorResume(ex -> {
+                                    log.warn("Can't deserialize cached page {}, will reload from DB", cacheKey, ex);
+                                    return Mono.empty();
+                                })
+                                .flatMapMany(Flux::fromIterable)
                 )
                 .switchIfEmpty( // положить в кеш если такого ключа еще нет
                         loadFromDb(keyword, pageable)
