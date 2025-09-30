@@ -9,4 +9,5 @@
     <include file="db/changelog/order_to_items-schema-init.xml"/>
     <include file="db/changelog/cart-schema-init.xml"/>
     <include file="db/changelog/cart_to_items-schema-init.xml"/>
+    <include file="db/changelog/user-schema-init.xml"/>
 </databaseChangeLog>

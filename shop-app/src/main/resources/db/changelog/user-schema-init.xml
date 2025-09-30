@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="create-users-table" author="timshowtimes">
+        <createTable tableName="users">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="username" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="role" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE" defaultValueComputed="NOW()"/>
+        </createTable>
+
+        <createIndex tableName="users" indexName="idx_users_username">
+            <column name="username"/>
+        </createIndex>
+
+        <insert tableName="users">
+            <column name="username" value="admin"/>
+            <column name="password" value="$2a$10$oY37AkzULXxDMVzoLHu9OO7omsfqcwSs6zbgTvhWgIMwRP/JiNLUC"/>
+            <column name="role" value="ROLE_ADMIN"/>
+        </insert>
+
+        <insert tableName="users">
+            <column name="username" value="default-user"/>
+            <column name="password" value="$2a$10$zEJEvf1Bl.R7zfoFYf1fWe6TJzm/GbE8LZayJ6E/3U6RvaRN7SNYC"/>
+            <column name="role" value="ROLE_USER"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
