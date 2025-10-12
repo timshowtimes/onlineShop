@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
@@ -31,6 +32,8 @@ public class Order {
 
     @Transient
     private List<Item> items = new ArrayList<>();
+
+    private Long userId;
 
     public String getTotalPrice() {
         return String.format("%,d ₸", totalPrice).replace(",", " ");

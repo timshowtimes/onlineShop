@@ -1,3 +1,51 @@
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logout-button {
+    background: linear-gradient(#9b3c3c, #ec4021, #e04b6c);
+    border: none;
+    color: white;
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+    /*transition: 0.3s;*/
+    transition: background 0.4s ease, transform 0.2s ease;
+}
+.logout-button:hover {
+    background: linear-gradient(135deg, #d90437, #983445);
+    transform: translateY(-1px);
+}
+
+
+.login-button {
+    background: linear-gradient(135deg, #007bff, #00aaff);
+    border: none;
+    color: white;
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.login-button:hover {
+    background: linear-gradient(135deg, #005ec2, #008fd1);
+    transform: translateY(-1px);
+}
+
 .item-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(238px, 1fr));
@@ -150,7 +198,7 @@ label {
 .form-controls p,
 .form-controls div {
     margin: 0;
-    flex: 1 1 300px; /* гибкое поведение блоков */
+    flex: 1 1 300px;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -217,7 +265,7 @@ label {
 
 .search-input-container input {
     width: 100%;
-    padding: 10px 12px 10px 36px; /* space for icon */
+    padding: 10px 12px 10px 36px;
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 1em;
@@ -280,3 +328,33 @@ a:hover {
     color: #007acc;
     text-decoration: none;
 }
+
+.user-inline {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 1.3rem;
+    color: #333;
+}
+
+
+.inline-username {
+    font-weight: 600;
+}
+
+.inline-logout {
+    color: #e63946;
+    text-decoration: none;
+}
+
+.inline-logout:hover {
+    text-decoration: underline;
+}
+
+
+.logout-form {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+

@@ -1,4 +1,4 @@
-package kz.timshowtime.onlineShop.model;
+package kz.timshowtime.paymentsapp.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,18 +8,22 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("cart")
+import java.math.BigDecimal;
+
+@Table("wallets")
 @Data
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class Cart {
+@NoArgsConstructor
+@Builder
+public class Wallet {
 
     @Id
-    private Long id;
-
-    @Column("total_price")
-    private int totalPrice;
-
+    @Column("user_id")
     private Long userId;
+
+    @Column("balance")
+    private Double balance;
+
+    @Column("currency")
+    private String currency;
 }

@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="UTF-8">
@@ -10,17 +12,32 @@
 
 <body>
 
-<a href="/orders" style="float:right;">
-    <b>ЗАКАЗЫ &cudarrr;</b>
-</a>
+<div class="top-bar">
+    <div class="nav-left">
+        <a href="/items/add-page"><b>ДОБАВИТЬ ТОВАР ⤵</b></a>
+    </div>
 
-<a href="/cart/items" style="float:right; margin-right: 15px;">
-    <b th:text="${'КОРЗИНА' + '(' + totalQuantity + ')'}"></b>
-</a>
+    <div class="nav-right">
+        <a href="/cart/items" style="float:right; margin-right: 15px;">
+            <b th:text="${'КОРЗИНА' + '(' + totalQuantity + ')'}"></b>
+        </a>
+        <a href="/orders"><b>ЗАКАЗЫ ⤵</b></a>
 
-<a href="/items/add-page">
-    <b>ДОБАВИТЬ ТОВАР &cudarrr;</b>
-</a>
+        <div class="user-inline" sec:authorize="isAuthenticated()">
+            👤 <span th:text="${#authentication.name}" class="inline-username">Пользователь</span>
+            |
+            <form th:action="@{/logout}" method="post" class="logout-form" sec:authorize="isAuthenticated()">
+                <button type="submit" class="logout-button">Выйти</button>
+            </form>
+        </div>
+
+
+        <a th:href="@{/login}" sec:authorize="isAnonymous()">
+            <button type="button" class="login-button">Войти</button>
+        </a>
+
+    </div>
+</div>
 
 <form>
     <div class="controls-container">

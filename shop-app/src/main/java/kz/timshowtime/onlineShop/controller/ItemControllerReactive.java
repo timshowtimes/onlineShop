@@ -4,6 +4,7 @@ import kz.timshowtime.onlineShop.dto.ItemDto;
 import kz.timshowtime.onlineShop.enums.SortName;
 import kz.timshowtime.onlineShop.model.Item;
 import kz.timshowtime.onlineShop.model.ItemPageable;
+import kz.timshowtime.onlineShop.security.UserDetailsImpl;
 import kz.timshowtime.onlineShop.service.CartItemService;
 import kz.timshowtime.onlineShop.service.ItemService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.FormFieldPart;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -45,8 +47,9 @@ public class ItemControllerReactive {
                             @RequestParam(value = "pageNumber", defaultValue = "0") Integer pageNumber,
                             @RequestParam(value = "cache", defaultValue = "true") Boolean cache,
                             @RequestParam(value = "evictById", defaultValue = "0") Long evictById,
+                            @AuthenticationPrincipal UserDetailsImpl userDetails,
                             Model model) {
-
+        Long userId = userDetails != null ? userDetails.getId() : null;
         String keyword = (name == null || name.isBlank()) ? "" : name;
 
         Sort sort = sortValue.getFieldName().equals("no")
@@ -56,8 +59,9 @@ public class ItemControllerReactive {
 
         Mono<Long> totalItemCountMono = itemService.count();
         Mono<List<ItemDto>> itemsMono = itemService.findAll(keyword, pageable).collectList();
-        Mono<List<ItemDto>> cartItemsMono = cartItemService.getAllItems(cache, evictById).collectList();
-        Mono<Integer> totalQuantityMono = cartItemService.getTotalQuantity();
+        System.out.println("DEBUG >>> " + cache + ", " + evictById + ", " + userId);
+        Mono<List<ItemDto>> cartItemsMono = cartItemService.getAllItemsByUserId(cache, evictById, userId).collectList();
+        Mono<Integer> totalQuantityMono = cartItemService.getTotalQuantityByUserId(userId);
 
         return Mono.zip(itemsMono, totalItemCountMono, cartItemsMono, totalQuantityMono)
                 .map(tuple -> {
@@ -99,8 +103,12 @@ public class ItemControllerReactive {
     }
 
     @GetMapping("/{id}")
-    public Mono<Rendering> getOne(@PathVariable("id") Long id) {
-        Mono<Integer> quantityMono = cartItemService.findQuantityByItemId(id);
+    public Mono<Rendering> getOne(@PathVariable("id") Long id,
+                                  @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Mono<Integer> quantityMono = userDetails != null
+                ? cartItemService.findQuantityByItemId(id, userDetails.getId())
+                : Mono.just(0); // TODO make for anon
+
         Mono<ItemDto> itemMono = itemService.findById(id);
 
         return Mono.zip(itemMono, quantityMono)

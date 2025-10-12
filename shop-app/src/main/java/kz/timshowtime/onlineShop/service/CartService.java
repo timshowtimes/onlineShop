@@ -20,8 +20,21 @@ public class CartService {
        return cartRepository.save(cart);
     }
 
+    public Mono<Cart> findByUserId(Long userId) {
+        return cartRepository.findByUserId(userId);
+    }
+
     public Mono<Cart> findById(long id) {
         return cartRepository.findById(id)
                 .switchIfEmpty(Mono.error(new NoSuchElementException("Cart not found with id " + id)));
+    }
+
+    @Transactional
+    public Mono<Cart> createCartForUser(Long userId) {
+        Cart cart = Cart.builder()
+                .userId(userId)
+                .totalPrice(0)
+                .build();
+        return cartRepository.save(cart);
     }
 }

@@ -15,4 +15,18 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="add user id and set constraint" author="timshowtimes">
+        <addColumn tableName="orders">
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <addForeignKeyConstraint baseTableName="orders"
+                                 baseColumnNames="user_id"
+                                 constraintName="fk_orders_users"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
 </databaseChangeLog>

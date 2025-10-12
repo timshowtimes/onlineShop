@@ -23,11 +23,24 @@ spring:
       port: 6379
       host: localhost
 
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+#      data-locations: classpath:test-data.sql
+
 server:
   port: 8888
 
 payments:
   url: ${PAYMENTS_URL:http://localhost:8082}
+
+keycloak:
+  client:
+    id: shop-app
+    secret: qNWByJUPVHBT4jXgwLnUkgvRWNHZupjz
+  token:
+    url: http://localhost:8080/realms/onlineshop/protocol/openid-connect/token
 
 
 logging:

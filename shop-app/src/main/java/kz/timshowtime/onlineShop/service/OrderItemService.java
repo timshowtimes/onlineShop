@@ -28,8 +28,8 @@ public class OrderItemService {
         return orderItemRepository.saveAll(orderItems).then();
     }
 
-    public Mono<List<Order>> findAllOrdersWithItems() {
-        return findAllWithItems()
+    public Mono<List<Order>> findAllOrdersWithItems(long userId) {
+        return findAllWithItems(userId)
                 .collect(Collectors.groupingBy(
                         OrderItemDto::getOrderId,
                         LinkedHashMap::new,
@@ -68,7 +68,7 @@ public class OrderItemService {
     }
 
 
-    private Flux<OrderItemDto> findAllWithItems() {
+    private Flux<OrderItemDto> findAllWithItems(long userId) {
         String sql = """
                     SELECT
                         o.id AS order_id,
@@ -84,10 +84,12 @@ public class OrderItemService {
                     FROM orders o
                     JOIN orders_items oi ON o.id = oi.order_id
                     JOIN item i ON oi.item_id = i.id
+                    WHERE o.user_id = :user_id
                     ORDER BY o.create_dt DESC
                 """;
 
         return databaseClient.sql(sql)
+                .bind("user_id", userId)
                 .map((row, meta) -> new OrderItemDto(
                         row.get("order_id", Long.class),
                         row.get("order_name", String.class),

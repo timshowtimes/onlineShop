@@ -29,15 +29,17 @@
             <column name="username"/>
         </createIndex>
 
+        <!--            password: admin                -->
         <insert tableName="users">
             <column name="username" value="admin"/>
-            <column name="password" value="$2a$10$oY37AkzULXxDMVzoLHu9OO7omsfqcwSs6zbgTvhWgIMwRP/JiNLUC"/>
+            <column name="password" value="$2a$10$J8xZ2brjkogsTND3R8hBve5BtvGGwthRkBrKJnoSLv0AZ6X/a.vg."/>
             <column name="role" value="ROLE_ADMIN"/>
         </insert>
 
+        <!--            password: user                 -->
         <insert tableName="users">
             <column name="username" value="default-user"/>
-            <column name="password" value="$2a$10$zEJEvf1Bl.R7zfoFYf1fWe6TJzm/GbE8LZayJ6E/3U6RvaRN7SNYC"/>
+            <column name="password" value="$2a$10$U1Bjz1GTTU7d8GvtYj8t0ef/CzNGWVZRMYaSjDhVEqyxJ6WRj/3dq"/>
             <column name="role" value="ROLE_USER"/>
         </insert>
     </changeSet>

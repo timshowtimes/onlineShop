@@ -1,25 +1,26 @@
 package kz.timshowtime.onlineShop.model;
 
+import kz.timshowtime.onlineShop.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("cart")
+import java.time.Instant;
+
+@Table("users")
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class Cart {
+@NoArgsConstructor
+public class ClientUser {
 
     @Id
     private Long id;
-
-    @Column("total_price")
-    private int totalPrice;
-
-    private Long userId;
+    private String username;
+    private String password;
+    private Role role;
+    private Instant createdAt;
 }

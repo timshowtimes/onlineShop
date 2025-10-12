@@ -3,16 +3,20 @@ package kz.timshowtime.onlineShop.controller;
 import kz.timshowtime.onlineShop.dto.ItemDto;
 import kz.timshowtime.onlineShop.factory.WalletsApiFactory;
 import kz.timshowtime.onlineShop.model.Cart;
+import kz.timshowtime.onlineShop.model.ClientUser;
 import kz.timshowtime.onlineShop.model.Order;
 import kz.timshowtime.onlineShop.model.manyToMany.CartItem;
 import kz.timshowtime.onlineShop.model.manyToMany.OrdersItem;
 import kz.timshowtime.onlineShop.paymentsclient.api.WalletsApi;
 import kz.timshowtime.onlineShop.paymentsclient.model.BalanceResponse;
 import kz.timshowtime.onlineShop.paymentsclient.model.ChargeRequest;
+import kz.timshowtime.onlineShop.security.ClientUserDetailsService;
+import kz.timshowtime.onlineShop.security.UserDetailsImpl;
 import kz.timshowtime.onlineShop.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -40,14 +44,21 @@ public class CartControllerReactive {
     private final OrderService orderService;
     private final OrderItemService orderItemService;
     private final WalletsApiFactory walletsApiFactory;
+    private final ClientUserDetailsService clientUserDetailsService;
 
     @GetMapping("/items")
     public Mono<String> getItems(Model model,
                                  @RequestParam(name = "cache", defaultValue = "true") Boolean cache,
-                                 @RequestParam(name = "evictById", defaultValue = "0") Long evictById) {
-        Flux<ItemDto> itemFlux = cartItemService.getAllItems(cache, evictById);
-        Mono<Cart> cartMono = cartService.findById(1);
-        Mono<BalanceResponse> balanceResponseMono = walletsApiFactory.create().getBalance()
+                                 @RequestParam(name = "evictById", defaultValue = "0") Long evictById,
+                                 @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        Long userId = userDetails.getId();
+        Flux<ItemDto> itemFlux = cartItemService.getAllItemsByUserId(cache, evictById, userId);
+
+        Mono<Cart> cartMono = cartService.findByUserId(userId)
+                        .switchIfEmpty(cartService.createCartForUser(userId));
+
+        Mono<BalanceResponse> balanceResponseMono = walletsApiFactory.create().getBalance(userId)
                 .onErrorResume(ex -> {
                     BalanceResponse fallback = new BalanceResponse()
                             .balance(-1.0)
@@ -87,7 +98,11 @@ public class CartControllerReactive {
 
     @PostMapping("/{itemId}")
     public Mono<String> putOnCart(@PathVariable Long itemId,
-                                  ServerWebExchange exchange) {
+                                  ServerWebExchange exchange,
+                                  @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Long userId = userDetails.getId();
+
+        System.out.println("USER ID: " + userId);
 
         return exchange.getFormData().flatMap(form -> {
 
@@ -95,11 +110,14 @@ public class CartControllerReactive {
                     .orElse("plus");
             String source = form.getFirst("source");
 
-            Mono<Cart> cartMono = cartService.findById(1L);
+            Mono<Cart> cartMono = cartService.findByUserId(userId)
+                            .switchIfEmpty(cartService.createCartForUser(userId));
+
             Mono<ItemDto> itemMono = itemService.findById(itemId);
-            Mono<Integer> qtyMono = cartItemService
-                    .findQuantityByItemId(itemId)   // текущее кол‑во
-                    .defaultIfEmpty(0);
+            Mono<Integer> qtyMono = cartMono.flatMap(cart -> cartItemService
+                    .findQuantityByItemId(itemId, userId )   // текущее кол‑во
+                    .defaultIfEmpty(0)
+            );
 
             return Mono.zip(cartMono, itemMono, qtyMono)
                     .flatMap(tuple -> {
@@ -153,16 +171,24 @@ public class CartControllerReactive {
 
 
     @PostMapping("/buy")
-    public Mono<String> buy() {
-        Mono<Cart> cartMono = cartService.findById(1);
-        Mono<Long> countMono = orderService.count();
+    public Mono<String> buy(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        System.out.println("USER ID: " + userDetails.getId());
+        Mono<Cart> cartMono = cartService.findByUserId(userDetails.getId());
         Mono<Long> nextOrderIdMono = orderService.getNextOrderId();
+        Mono<ClientUser> clientUserMono = clientUserDetailsService.loadUserByUsername(userDetails.getUsername()).cache();
+        Mono<Long> countMono = clientUserMono.flatMap(user -> orderService.countByUserId(user.getId()));
 
-        return Mono.zip(cartMono, countMono, nextOrderIdMono)
+        System.out.println("CartMono: " + cartMono);
+        System.out.println("CountMono: " + countMono);
+        System.out.println("nextOrderIdMono: " + nextOrderIdMono);
+        System.out.println("clientUserMono: " + clientUserMono);
+
+        return Mono.zip(cartMono, countMono, nextOrderIdMono, clientUserMono)
                 .flatMap(tuple -> {
                     Cart cart = tuple.getT1();
                     Long count = tuple.getT2();
                     Long nextOrderId = tuple.getT3();
+                    ClientUser clientUser = tuple.getT4();
                     double totalPrice = cart.getTotalPrice();
 
                     return cartItemService.getCartItems(cart.getId())
@@ -178,14 +204,14 @@ public class CartControllerReactive {
                                 chargeRequest.setAmount(totalPrice);
                                 chargeRequest.setOrderId(BigDecimal.valueOf(nextOrderId));
 
-                                return walletsApi.charge(chargeRequest)
+                                return walletsApi.charge(userDetails.getId(), chargeRequest)
                                         .onErrorResume(ex -> {
                                             log.error("❌ Ошибка при обращении к payments-app", ex);
                                             return Mono.error(new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Платёжный сервис недоступен"));
                                         })
                                         .doOnSuccess(result -> log.debug("Списание успешно, результат: {}", result))
                                         .flatMap(chargeResult ->
-                                                createAndSaveOrder(orderName, itemsIdWithQuantities, cart.getTotalPrice())
+                                                createAndSaveOrder(orderName, itemsIdWithQuantities, clientUser.getId(), cart.getTotalPrice())
                                                         .doOnSuccess(order -> log.debug("Заказ сохранен, id заказа: {}", order.getId()))
                                                         .flatMap(savedOrder ->
                                                                 cartItemService.deleteAllByCart(cart)
@@ -204,10 +230,11 @@ public class CartControllerReactive {
 
     }
 
-    public Mono<Order> createAndSaveOrder(String name, Map<Long, Integer> itemIdQuantityMap, int total) {
+    public Mono<Order> createAndSaveOrder(String name, Map<Long, Integer> itemIdQuantityMap, long userId, int total) {
         Order orderToSave = Order.builder()
                 .name(name)
                 .totalPrice(total)
+                .userId(userId)
                 .createDt(LocalDateTime.now())
                 .build();
 

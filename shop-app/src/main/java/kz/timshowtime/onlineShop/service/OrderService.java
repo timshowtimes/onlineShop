@@ -1,6 +1,7 @@
 package kz.timshowtime.onlineShop.service;
 
 import kz.timshowtime.onlineShop.dto.ItemDto;
+import kz.timshowtime.onlineShop.model.ClientUser;
 import kz.timshowtime.onlineShop.model.Order;
 import kz.timshowtime.onlineShop.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -63,7 +64,7 @@ public class OrderService {
                 .switchIfEmpty(Mono.error(new NoSuchElementException("Order not found with id " + id)));
     }
 
-    public Mono<Long> count() {
-        return orderRepository.count();
+    public Mono<Long> countByUserId(long userId) {
+        return orderRepository.countByUserId(userId);
     }
 }

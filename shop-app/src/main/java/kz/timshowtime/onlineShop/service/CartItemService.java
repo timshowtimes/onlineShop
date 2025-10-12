@@ -27,8 +27,8 @@ public class CartItemService {
 
     public static final String CART_ITEMS_KEY = "cart:items";
 
-    public Mono<Integer> getTotalQuantity() {
-        return cartItemRepository.getTotalQuantity();
+    public Mono<Integer> getTotalQuantityByUserId(Long usersId) {
+        return cartItemRepository.getTotalQuantityByUserId(usersId);
     }
 
     @Transactional
@@ -36,41 +36,42 @@ public class CartItemService {
         return cartItemRepository.deleteAllByCartId(cart.getId());
     }
 
-    public Mono<Void> evictCartItemById(Long id) {
-        if (id == -1L) {
-            return cartItemRedisTemplate.delete(CART_ITEMS_KEY).then();
+    public Mono<Void> evictCartItemById(Long itemId, Long userId) {
+        if (itemId == -1L) {
+            return cartItemRedisTemplate.delete(CART_ITEMS_KEY + ":" + userId).then();
         }
         return cartItemRedisTemplate.opsForHash()
-                .remove(CART_ITEMS_KEY, id.toString())
+                .remove(CART_ITEMS_KEY + ":" + userId, itemId.toString())
                 .then();
     }
 
 
-    public Flux<ItemDto> getAllItems(Boolean cache, Long evictById) {
+    public Flux<ItemDto> getAllItemsByUserId(Boolean cache, Long evictById, Long userId) {
+        if (userId == null) return Flux.empty(); // anon user
         Flux<ItemDto> cached = cartItemRedisTemplate.opsForHash()
-                .values(CART_ITEMS_KEY)
+                .values(CART_ITEMS_KEY + ":" + userId)
                 .cast(ItemDto.class);
 
         Mono<Void> eviction = Mono.empty();
         if (evictById != 0L) {
-            log.info("🗑️ [Корзина] Удаляем товар {} из кэша {}", evictById, CART_ITEMS_KEY);
-            eviction = evictCartItemById(evictById);
+            log.info("🗑️ [Корзина] Удаляем товар {} из кэша {}", evictById, CART_ITEMS_KEY + ":" + userId);
+            eviction = evictCartItemById(evictById, userId);
         }
 
         return eviction.thenMany(cached.hasElements()
                 .flatMapMany(hasCache -> {
                     if (hasCache && cache) {
-                        log.info("✅ [Корзина] Данные получены из Redis-кэша по ключу {}", CART_ITEMS_KEY);
+                        log.info("✅ [Корзина] Данные получены из Redis-кэша по ключу {}", CART_ITEMS_KEY + ":" + userId);
                         return cached;
                     } else {
                         log.info("📦 [Корзина] Кэш пуст — загружаем из БД и кладем в Redis");
-                        return cartItemRepository.getAllItems()
+                        return cartItemRepository.getAllItemsByUserId(userId)
                                 .collectList()
                                 .flatMapMany(items -> Flux.fromIterable(items)
                                         .flatMap(item ->
                                                 cartItemRedisTemplate.opsForHash()
-                                                        .put(CART_ITEMS_KEY, item.getId(), item)
-                                                        .then(cartItemRedisTemplate.expire(CART_ITEMS_KEY, Duration.ofMinutes(2)))
+                                                        .put(CART_ITEMS_KEY + ":" + userId, item.getId(), item)
+                                                        .then(cartItemRedisTemplate.expire(CART_ITEMS_KEY + ":" + userId, Duration.ofMinutes(2)))
                                                         .thenReturn(item)
                                         )
                                 );
@@ -89,8 +90,8 @@ public class CartItemService {
         return cartItemRepository.findByCartId(cartId);
     }
 
-    public Mono<Integer> findQuantityByItemId(long itemId) {
-        return cartItemRepository.findQuantityByItemId(itemId);
+    public Mono<Integer> findQuantityByItemId(long itemId, long userId) {
+        return cartItemRepository.findQuantityByItemId(itemId, userId);
     }
 
     @Transactional

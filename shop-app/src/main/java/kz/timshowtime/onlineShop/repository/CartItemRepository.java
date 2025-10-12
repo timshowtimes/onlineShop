@@ -14,30 +14,41 @@ import java.util.List;
 @Repository
 public interface CartItemRepository extends R2dbcRepository<CartItem, Long> {
 
-    @Query("SELECT COALESCE(SUM(quantity), 0) AS quantity FROM cart_items WHERE item_id = :itemId")
-    Mono<Integer> findQuantityByItemId(@Param("itemId") Long itemId);
+    @Query("""
+                SELECT COALESCE(SUM(quantity), 0) AS quantity
+                FROM cart_items ci
+                JOIN cart c ON ci.cart_id = c.id
+                WHERE item_id = :itemId AND c.user_id = :userId
+            """)
+    Mono<Integer> findQuantityByItemId(@Param("itemId") Long itemId, @Param("userId") Long userId);
 
     @Query("""
-       INSERT INTO cart_items (cart_id, item_id, quantity, create_dt)
-       VALUES (:#{#ci.cartId}, :#{#ci.itemId}, :#{#ci.quantity}, :#{#ci.createDt})
-       ON CONFLICT (cart_id, item_id) DO UPDATE
-         SET quantity  = EXCLUDED.quantity,
-             create_dt = EXCLUDED.create_dt
-       RETURNING *
-       """)
+                INSERT INTO cart_items (cart_id, item_id, quantity, create_dt)
+                VALUES (:#{#ci.cartId}, :#{#ci.itemId}, :#{#ci.quantity}, :#{#ci.createDt})
+                ON CONFLICT (cart_id, item_id) DO UPDATE
+                  SET quantity  = EXCLUDED.quantity,
+                      create_dt = EXCLUDED.create_dt
+                RETURNING *
+            """)
     Mono<CartItem> saveOrUpdate(@Param("ci") CartItem ci);
 
     @Query("""
-        SELECT i.id, i.name, i.price, i.description, i.preview, ci.quantity
-        FROM item i
-        JOIN cart_items ci ON i.id = ci.item_id
-        ORDER BY ci.create_dt DESC
-    """)
-    Flux<ItemDto> getAllItems();
+                SELECT i.id, i.name, i.price, i.description, i.preview, ci.quantity
+                FROM item i
+                JOIN cart_items ci ON i.id = ci.item_id
+                JOIN cart c ON ci.cart_id = c.id
+                WHERE c.user_id = :userId
+                ORDER BY ci.create_dt DESC
+            """)
+    Flux<ItemDto> getAllItemsByUserId(@Param("userId") Long userId);
 
 
-    @Query("SELECT COALESCE(SUM(quantity), 0) FROM cart_items")
-    Mono<Integer> getTotalQuantity();
+    @Query("""
+             SELECT COALESCE(SUM(quantity), 0) FROM cart_items ci
+             JOIN cart c ON ci.cart_id = c.id
+             WHERE c.user_id = :userId
+            """)
+    Mono<Integer> getTotalQuantityByUserId(@Param("userId") Long userId);
 
 
     Mono<Void> deleteByItemId(Long itemId);

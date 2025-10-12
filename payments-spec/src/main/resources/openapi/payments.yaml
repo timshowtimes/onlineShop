@@ -14,6 +14,13 @@ paths:
       tags: [ Wallets ]
       operationId: getBalance
       summary: Получить текущий баланс пользователя
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: long
+          description: Уникальный идентификатор пользователя
       responses:
         '200':
           description: Баланс найден
@@ -29,6 +36,13 @@ paths:
       tags: [ Wallets ]
       operationId: charge
       summary: Списать сумму заказа с баланса
+      parameters:
+        - name: usersId
+          in: query
+          required: true
+          schema:
+            type: long
+          description: Уникальный идентификатор пользователя
       requestBody:
         required: true
         content:
